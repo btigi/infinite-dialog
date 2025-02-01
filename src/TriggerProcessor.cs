@@ -2,11 +2,13 @@
 {
     private readonly ObjectLocator objectLocator;
     private readonly IdsProcessor idsProcessor;
+    private readonly Random random;
 
     public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor)
     {
         this.objectLocator = objectLocator;
         this.idsProcessor = idsProcessor;
+        random = new Random();
     }
 
     public Area Area { get; set; }
@@ -377,12 +379,20 @@
 
     public bool PartyHasItem(string item)
     {
+        foreach (var partyMember in objectLocator.Party.Members)
+        {
+            if (partyMember.Creature.Items.Contains(item))
+            {
+                return true;
+            }
+        }
         return false;
     }
 
     public bool InParty(string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return objectLocator.Party.Members.Select(s => s.Creature).Contains(creature);
     }
 
     public bool CheckStat(string obj, int value, int statNum)
@@ -402,17 +412,17 @@
 
     public bool RandomNum(int range, int value)
     {
-        return false;
+        return random.Next(1, range) == value;
     }
 
     public bool RandomNumGT(int range, int value)
     {
-        return false;
+        return random.Next(1, range) > value;
     }
 
     public bool RandomNumLT(int range, int value)
     {
-        return false;
+        return random.Next(1, range) < value;
     }
 
     public bool Died(string obj)
@@ -438,17 +448,17 @@
 
     public bool PartyGold(int amount)
     {
-        return false;
+        return objectLocator.Party.PartyGold == amount;
     }
 
     public bool PartyGoldGT(int amount)
     {
-        return false;
+        return objectLocator.Party.PartyGold > amount;
     }
 
     public bool PartyGoldLT(int amount)
     {
-        return false;
+        return objectLocator.Party.PartyGold < amount;
     }
 
     public bool Dead(string name)
@@ -533,7 +543,8 @@
 
     public bool HasItem(string resRef, string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return creature.Items.Any(a => a == resRef);
     }
 
     public bool InteractingWith(string obj)
@@ -553,17 +564,20 @@
 
     public bool Happiness(string obj, int amount)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return objectLocator.Party.Members.SingleOrDefault(s => s.Creature == creature)?.Happiness == amount;
     }
 
     public bool HappinessGT(string obj, int amount)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return objectLocator.Party.Members.SingleOrDefault(s => s.Creature == creature)?.Happiness > amount;
     }
 
     public bool HappinessLT(string obj, int amount)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return objectLocator.Party.Members.SingleOrDefault(s => s.Creature == creature)?.Happiness < amount;
     }
 
     public bool TimeGT(int time)
@@ -578,17 +592,17 @@
 
     public bool NumInParty(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count() == num;
     }
-
+    
     public bool NumInPartyGT(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count() > num;
     }
 
     public bool NumInPartyLT(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count() < num;
     }
 
     public bool UnselectableVariable(int num)
@@ -648,17 +662,20 @@
 
     public bool NumItems(string resRef, string obj, int num)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return creature?.Items.Count(w => w == resRef) == num;
     }
 
     public bool NumItemsGT(string resRef, string obj, int num)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return creature?.Items.Count(w => w == resRef) > num;
     }
 
     public bool NumItemsLT(string resRef, string obj, int num)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return creature?.Items.Count(w => w == resRef) < num;
     }
 
     public bool NumItemsParty(string resRef, int num)
@@ -763,17 +780,62 @@
 
     public bool Level(string obj, int level)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        var creatureLevel = creature?.Level1;
+
+        var divisor = 1;
+        if (creature?.Level2 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level2;
+        }
+        if (creature?.Level3 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level3;
+        }
+
+        return (creatureLevel / divisor) == level;
     }
 
     public bool LevelGT(string obj, int level)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        var creatureLevel = creature?.Level1;
+
+        var divisor = 1;
+        if (creature?.Level2 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level2;
+        }
+        if (creature?.Level3 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level3;
+        }
+
+        return (creatureLevel / divisor) > level;
     }
 
     public bool LevelLT(string obj, int level)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        var creatureLevel = creature?.Level1;
+
+        var divisor = 1;
+        if (creature?.Level2 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level2;
+        }
+        if (creature?.Level3 > 0)
+        {
+            divisor++;
+            creatureLevel += creature?.Level3;
+        }
+
+        return (creatureLevel / divisor) < level;
     }
 
     public bool Summoned(string obj)
@@ -854,7 +916,8 @@
 
     public bool Name(string name, string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return creature?.ScriptName == name;
     }
 
     public bool SpellCastPriest(string obj, int spell)
@@ -869,6 +932,8 @@
 
     public bool IsValidForPartyDialog(string obj)
     {
+        // obj is in the party
+        // obj is not dead
         return false;
     }
 
@@ -919,17 +984,17 @@
 
     public bool NumInPartyAlive(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count(c => c.State != 0x8000) == num;
     }
 
     public bool NumInPartyAliveGT(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count(c => c.State != 0x8000) > num;
     }
 
     public bool NumInPartyAliveLT(int num)
     {
-        return false;
+        return objectLocator.Party.Members.Count(c => c.State != 0x8000) < num;
     }
 
     public bool Kit(string obj, int kit)
@@ -994,22 +1059,22 @@
 
     public bool G(string resRef, int num)
     {
-        return false;
+        return this.GlobalState.SingleOrDefault(w => w.name == resRef).value == num;
     }
 
     public bool GGT(string resRef, int num)
     {
-        return false;
+        return this.GlobalState.SingleOrDefault(w => w.name == resRef).value > num;
     }
 
     public bool GLT(string resRef, int num)
     {
-        return false;
+        return this.GlobalState.SingleOrDefault(w => w.name == resRef).value < num;
     }
 
     public bool ModalState(int state)
     {
-        return false;
+        return objectLocator.Party.Members.SingleOrDefault(s => s.Creature == this.Creature)?.ModalAction == state;
     }
 
     public bool InMyArea(string obj)

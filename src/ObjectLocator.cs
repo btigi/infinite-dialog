@@ -13,6 +13,9 @@
         return null;
     }
 
+    public List<Creature> AllCreatures = [];
+    public Party Party = new();
+
     public Creature Myself { get; set; }
     public Creature LeaderOf { get; set; }
     public Creature GroupOf { get; set; }

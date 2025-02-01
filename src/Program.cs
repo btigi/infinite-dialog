@@ -1,12 +1,24 @@
 ﻿//var triggerText = "Global(\"Lumbar_Huff\", \"GLOBAL\", 1)Global(\"Know_L\r\numbar\", \"GLOBAL\", 0)";
-var triggerText = "AreaCheck(\"AR1234\")Global(\"test\", \"global\", 1)HP(Myself, 10)";
+var triggerText = "AreaCheck(\"AR1234\")Global(\"test\", \"global\", 1)HP(Myself, 100)InParty(Myself)PartyHasItem(\"test\")";
 var actionText = "JoinParty(test, 1) NoAction()";
 
 var myself = new Creature();
 myself.HP = 100;
+myself.Items.Add("test");
+
+var partyMember = new PartyMember();
+partyMember.Creature = myself;
+partyMember.Happiness = 1;
+
+var party = new Party();
+party.Members.Add(partyMember);
+party.PartyGold = 50;
 
 var objectLocator = new ObjectLocator();
 objectLocator.Myself = myself;
+
+objectLocator.AllCreatures.Add(myself);
+objectLocator.Party = party;
 
 var idsProcessor = new IdsProcessor();
 
@@ -16,6 +28,7 @@ globalState.Add(("test", 1));
 var area = new Area();
 area.AreaCode = "AR1234";
 
+Console.WriteLine("Triggers");
 var tp = new TriggerProcessor(objectLocator, idsProcessor);
 tp.Area = area;
 tp.GlobalState = globalState;
@@ -26,6 +39,8 @@ var triggered = ProcessMethod<TriggerProcessor>(triggers, tp);
 
 if (triggered)
 {
+    Console.WriteLine("");
+    Console.WriteLine("Actions");
     var ap = new ActionProcessor(objectLocator, idsProcessor);
     var actions = actionText.Split([")"], StringSplitOptions.None)
                             .Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
@@ -56,17 +71,18 @@ static bool ProcessMethod<T>(string[] methods, object o)
                                          .Select(m => (m as string) != null ? (m as string).Trim('\"') : m)
                                          .ToArray();
 
+            Console.WriteLine($"  {methodName} {String.Join(",", methodParameters)}");
             result = method.Invoke(o, methodParameters) as bool?;
             if (result != true)
             {
-                Console.WriteLine("Method result: " + false);
+                Console.WriteLine("    Method result: " + false);
                 break;
             }
-            Console.WriteLine("Method result: " + result);
+            Console.WriteLine("    Method result: " + result);
         }
         else
         {
-            Console.WriteLine("Method not found.");
+            Console.WriteLine("    Method not found.");
         }
     }
     return result ?? false;

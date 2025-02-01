@@ -19,10 +19,16 @@
     public int Morale { get; set; }
     public int Reputation { get; set; }
     public int State { get; set; }
+    public int Level1 { get; set; }
+    public int Level2 { get; set; }
+    public int Level3 { get; set; }
+    public string ScriptName { get; set; }
 
     public bool FallenRanger { get; set; }
     public bool FallenPaladin { get; set; }
 
     public List<int> MemorisedSpells { get; set; } = [];
-    public List<string> Items { get; set; } = [];
+    public List<string> Items { get; set; } = []; // should be a fixed sized array, with constants (e.g. FIST) to represent each element
+
+    public bool InParty { get; set; }
 }
