@@ -1,6 +1,8 @@
-﻿public class ObjectLocator()
+﻿using ii.InfinityEngine.Files;
+
+public class ObjectLocator()
 {
-    public Creature GetObject(string obj)
+    public CreFile GetObject(string obj)
     {
         var type = this.GetType();
         var propertyInfos = type.GetProperties();
@@ -8,131 +10,131 @@
         var method = propertyInfos.Where(propertyInfo => propertyInfo.Name == obj).SingleOrDefault();
         if (method != null)
         {
-            return (Creature)method.GetValue(this);
+            return (CreFile)method.GetValue(this);
         }
-        else if (AllCreatures.Any(creature => creature.ScriptName == obj))
+        else if (AllCreatures.Any(creature => creature.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()))
         {
-            return AllCreatures.Where(creature => creature.ScriptName == obj).Single();
+            return AllCreatures.Where(creature => creature.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()).Single();
 		}
         return null;
     }
 
-    public List<Creature> AllCreatures = [];
-    public Party Party = new();
+    public List<CreFile> AllCreatures = [];
+    public List<GamNpcStruct> Party = new();
 
-    public Creature Myself { get; set; }
-    public Creature LeaderOf { get; set; }
-    public Creature GroupOf { get; set; }
-    public Creature WeakestOf { get; set; }
-    public Creature StrongestOf { get; set; }
-    public Creature MostDamagedOf { get; set; }
-    public Creature LeastDamagedOf { get; set; }
-    public Creature ProtectedBy { get; set; }
-    public Creature ProtectorOf { get; set; }
-    public Creature LastAttackerOf { get; set; }
-    public Creature LastTargettedBy { get; set; }
-    public Creature NearestEnemyOf { get; set; }
-    public Creature LastCommandedBy { get; set; }
-    public Creature Nearest { get; set; }
-    public Creature LastHitter { get; set; }
-    public Creature LastTrigger { get; set; }
-    public Creature LastSeenBy { get; set; }
-    public Creature LastTalkedToBy { get; set; }
-    public Creature LastHeardBy { get; set; }
-    public Creature Player1 { get; set; }
-    public Creature Player2 { get; set; }
-    public Creature Player3 { get; set; }
-    public Creature Player4 { get; set; }
-    public Creature Player5 { get; set; }
-    public Creature Player6 { get; set; }
-    public Creature Protagonist { get; set; }
-    public Creature StrongestOfMale { get; set; }
-    public Creature SecondNearestEnemyOf { get; set; }
-    public Creature ThirdNearestEnemyOf { get; set; }
-    public Creature FourthNearestEnemyOf { get; set; }
-    public Creature FifthNearestEnemyOf { get; set; }
-    public Creature SixthNearestEnemyOf { get; set; }
-    public Creature SeventhNearestEnemyOf { get; set; }
-    public Creature EighthNearestEnemyOf { get; set; }
-    public Creature NinthNearestEnemyOf { get; set; }
-    public Creature TenthNearestEnemyOf { get; set; }
-    public Creature SecondNearest { get; set; }
-    public Creature ThirdNearest { get; set; }
-    public Creature FourthNearest { get; set; }
-    public Creature FifthNearest { get; set; }
-    public Creature SixthNearest { get; set; }
-    public Creature SeventhNearest { get; set; }
-    public Creature EighthNearest { get; set; }
-    public Creature NinthNearest { get; set; }
-    public Creature TenthNearest { get; set; }
-    public Creature WorstAC { get; set; }
-    public Creature BestAC { get; set; }
-    public Creature LastSummonerOf { get; set; }
-    public Creature NearestEnemyOfType { get; set; }
-    public Creature SecondNearestEnemyOfType { get; set; }
-    public Creature ThirdNearestEnemyOfType { get; set; }
-    public Creature FourthNearestEnemyOfType { get; set; }
-    public Creature FifthNearestEnemyOfType { get; set; }
-    public Creature SixthNearestEnemyOfType { get; set; }
-    public Creature SeventhNearestEnemyOfType { get; set; }
-    public Creature EigthNearestEnemyOfType { get; set; }
-    public Creature EighthNearestEnemyOfType { get; set; }
-    public Creature NinthNearestEnemyOfType { get; set; }
-    public Creature TenthNearestEnemyOfType { get; set; }
-    public Creature NearestMyGroupOfType { get; set; }
-    public Creature SecondNearestMyGroupOfType { get; set; }
-    public Creature ThirdNearestMyGroupOfType { get; set; }
-    public Creature FourthNearestMyGroupOfType { get; set; }
-    public Creature FifthNearestMyGroupOfType { get; set; }
-    public Creature SixthNearestMyGroupOfType { get; set; }
-    public Creature SeventhNearestMyGroupOfType { get; set; }
-    public Creature EigthNearestMyGroupOfType { get; set; }
-    public Creature EighthNearestMyGroupOfType { get; set; }
-    public Creature NinthNearestMyGroupOfType { get; set; }
-    public Creature TenthNearestMyGroupOfType { get; set; }
-    public Creature Player1Fill { get; set; }
-    public Creature Player2Fill { get; set; }
-    public Creature Player3Fill { get; set; }
-    public Creature Player4Fill { get; set; }
-    public Creature Player5Fill { get; set; }
-    public Creature Player6Fill { get; set; }
-    public Creature NearestDoor { get; set; }
-    public Creature SecondNearestDoor { get; set; }
-    public Creature ThirdNearestDoor { get; set; }
-    public Creature FourthNearestDoor { get; set; }
-    public Creature FifthNearestDoor { get; set; }
-    public Creature SixthNearestDoor { get; set; }
-    public Creature SeventhNearestDoor { get; set; }
-    public Creature EighthNearestDoor { get; set; }
-    public Creature NinthNearestDoor { get; set; }
-    public Creature TenthNearestDoor { get; set; }
-    public Creature PartySlot1 { get; set; }
-    public Creature PartySlot2 { get; set; }
-    public Creature PartySlot3 { get; set; }
-    public Creature PartySlot4 { get; set; }
-    public Creature PartySlot5 { get; set; }
-    public Creature PartySlot6 { get; set; }
-    public Creature Familiar { get; set; }
-    public Creature FamiliarSummoner { get; set; }
-    public Creature LastKilled { get; set; }
-    public Creature NearestAllyOf { get; set; }
-    public Creature SecondNearestAllyOf { get; set; }
-    public Creature ThirdNearestAllyOf { get; set; }
-    public Creature FourthNearestAllyOf { get; set; }
-    public Creature FifthNearestAllyOf { get; set; }
-    public Creature SixthNearestAllyOf { get; set; }
-    public Creature SeventhNearestAllyOf { get; set; }
-    public Creature EighthNearestAllyOf { get; set; }
-    public Creature NinthNearestAllyOf { get; set; }
-    public Creature TenthNearestAllyOf { get; set; }
-    public Creature FarthestEnemyOf { get; set; }
-    public Creature SecondFarthestEnemyOf { get; set; }
-    public Creature ThirdFarthestEnemyOf { get; set; }
-    public Creature FourthFarthestEnemyOf { get; set; }
-    public Creature FifthFarthestEnemyOf { get; set; }
-    public Creature SixthFarthestEnemyOf { get; set; }
-    public Creature SeventhFarthestEnemyOf { get; set; }
-    public Creature EighthFarthestEnemyOf { get; set; }
-    public Creature NinthFarthestEnemyOf { get; set; }
-    public Creature TenthFarthestEnemyOf { get; set; }
+	public CreFile Myself { get; set; }
+    public CreFile LeaderOf { get; set; }
+    public CreFile GroupOf { get; set; }
+    public CreFile WeakestOf { get; set; }
+    public CreFile StrongestOf { get; set; }
+    public CreFile MostDamagedOf { get; set; }
+    public CreFile LeastDamagedOf { get; set; }
+    public CreFile ProtectedBy { get; set; }
+    public CreFile ProtectorOf { get; set; }
+    public CreFile LastAttackerOf { get; set; }
+    public CreFile LastTargettedBy { get; set; }
+    public CreFile NearestEnemyOf { get; set; }
+    public CreFile LastCommandedBy { get; set; }
+    public CreFile Nearest { get; set; }
+    public CreFile LastHitter { get; set; }
+    public CreFile LastTrigger { get; set; }
+    public CreFile LastSeenBy { get; set; }
+    public CreFile LastTalkedToBy { get; set; }
+    public CreFile LastHeardBy { get; set; }
+    public CreFile Player1 { get; set; }
+    public CreFile Player2 { get; set; }
+    public CreFile Player3 { get; set; }
+    public CreFile Player4 { get; set; }
+    public CreFile Player5 { get; set; }
+    public CreFile Player6 { get; set; }
+    public CreFile Protagonist { get; set; }
+    public CreFile StrongestOfMale { get; set; }
+    public CreFile SecondNearestEnemyOf { get; set; }
+    public CreFile ThirdNearestEnemyOf { get; set; }
+    public CreFile FourthNearestEnemyOf { get; set; }
+    public CreFile FifthNearestEnemyOf { get; set; }
+    public CreFile SixthNearestEnemyOf { get; set; }
+    public CreFile SeventhNearestEnemyOf { get; set; }
+    public CreFile EighthNearestEnemyOf { get; set; }
+    public CreFile NinthNearestEnemyOf { get; set; }
+    public CreFile TenthNearestEnemyOf { get; set; }
+    public CreFile SecondNearest { get; set; }
+    public CreFile ThirdNearest { get; set; }
+    public CreFile FourthNearest { get; set; }
+    public CreFile FifthNearest { get; set; }
+    public CreFile SixthNearest { get; set; }
+    public CreFile SeventhNearest { get; set; }
+    public CreFile EighthNearest { get; set; }
+    public CreFile NinthNearest { get; set; }
+    public CreFile TenthNearest { get; set; }
+    public CreFile WorstAC { get; set; }
+    public CreFile BestAC { get; set; }
+    public CreFile LastSummonerOf { get; set; }
+    public CreFile NearestEnemyOfType { get; set; }
+    public CreFile SecondNearestEnemyOfType { get; set; }
+    public CreFile ThirdNearestEnemyOfType { get; set; }
+    public CreFile FourthNearestEnemyOfType { get; set; }
+    public CreFile FifthNearestEnemyOfType { get; set; }
+    public CreFile SixthNearestEnemyOfType { get; set; }
+    public CreFile SeventhNearestEnemyOfType { get; set; }
+    public CreFile EigthNearestEnemyOfType { get; set; }
+    public CreFile EighthNearestEnemyOfType { get; set; }
+    public CreFile NinthNearestEnemyOfType { get; set; }
+    public CreFile TenthNearestEnemyOfType { get; set; }
+    public CreFile NearestMyGroupOfType { get; set; }
+    public CreFile SecondNearestMyGroupOfType { get; set; }
+    public CreFile ThirdNearestMyGroupOfType { get; set; }
+    public CreFile FourthNearestMyGroupOfType { get; set; }
+    public CreFile FifthNearestMyGroupOfType { get; set; }
+    public CreFile SixthNearestMyGroupOfType { get; set; }
+    public CreFile SeventhNearestMyGroupOfType { get; set; }
+    public CreFile EigthNearestMyGroupOfType { get; set; }
+    public CreFile EighthNearestMyGroupOfType { get; set; }
+    public CreFile NinthNearestMyGroupOfType { get; set; }
+    public CreFile TenthNearestMyGroupOfType { get; set; }
+    public CreFile Player1Fill { get; set; }
+    public CreFile Player2Fill { get; set; }
+    public CreFile Player3Fill { get; set; }
+    public CreFile Player4Fill { get; set; }
+    public CreFile Player5Fill { get; set; }
+    public CreFile Player6Fill { get; set; }
+    public CreFile NearestDoor { get; set; }
+    public CreFile SecondNearestDoor { get; set; }
+    public CreFile ThirdNearestDoor { get; set; }
+    public CreFile FourthNearestDoor { get; set; }
+    public CreFile FifthNearestDoor { get; set; }
+    public CreFile SixthNearestDoor { get; set; }
+    public CreFile SeventhNearestDoor { get; set; }
+    public CreFile EighthNearestDoor { get; set; }
+    public CreFile NinthNearestDoor { get; set; }
+    public CreFile TenthNearestDoor { get; set; }
+    public CreFile PartySlot1 { get; set; }
+    public CreFile PartySlot2 { get; set; }
+    public CreFile PartySlot3 { get; set; }
+    public CreFile PartySlot4 { get; set; }
+    public CreFile PartySlot5 { get; set; }
+    public CreFile PartySlot6 { get; set; }
+    public CreFile Familiar { get; set; }
+    public CreFile FamiliarSummoner { get; set; }
+    public CreFile LastKilled { get; set; }
+    public CreFile NearestAllyOf { get; set; }
+    public CreFile SecondNearestAllyOf { get; set; }
+    public CreFile ThirdNearestAllyOf { get; set; }
+    public CreFile FourthNearestAllyOf { get; set; }
+    public CreFile FifthNearestAllyOf { get; set; }
+    public CreFile SixthNearestAllyOf { get; set; }
+    public CreFile SeventhNearestAllyOf { get; set; }
+    public CreFile EighthNearestAllyOf { get; set; }
+    public CreFile NinthNearestAllyOf { get; set; }
+    public CreFile TenthNearestAllyOf { get; set; }
+    public CreFile FarthestEnemyOf { get; set; }
+    public CreFile SecondFarthestEnemyOf { get; set; }
+    public CreFile ThirdFarthestEnemyOf { get; set; }
+    public CreFile FourthFarthestEnemyOf { get; set; }
+    public CreFile FifthFarthestEnemyOf { get; set; }
+    public CreFile SixthFarthestEnemyOf { get; set; }
+    public CreFile SeventhFarthestEnemyOf { get; set; }
+    public CreFile EighthFarthestEnemyOf { get; set; }
+    public CreFile NinthFarthestEnemyOf { get; set; }
+    public CreFile TenthFarthestEnemyOf { get; set; }
 }

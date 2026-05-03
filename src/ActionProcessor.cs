@@ -1,4 +1,6 @@
-﻿public class ActionProcessor
+﻿using ii.InfinityEngine.Files;
+
+public class ActionProcessor
 {
     private readonly ObjectLocator objectLocator;
     private readonly IdsProcessor idsProcessor;
@@ -10,7 +12,7 @@
     }
 
     public Area Area { get; set; }
-    public Creature Creature { get; set; }
+    public CreFile Creature { get; set; }
 
     public bool NoAction()
     {

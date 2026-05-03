@@ -1,19 +1,26 @@
-﻿using ii.InfinityEngine;
+﻿using System.Formats.Tar;
+using ii.InfinityEngine;
 using ii.InfinityEngine.Files;
-using System.Linq;
+using ii.InfinityEngine.Readers;
 
 var game = new Game("D:\\Games\\ie\\bg2ee", "D:\\Games\\ie\\bg2ee\\lang\\en_US");
 game.LoadResources([IEFileType.Dlg, IEFileType.Ids]);
 
+var gamReader = new GamFileBinaryReader();
+gamReader.TlkFile = game.Tlk;
+var gam = gamReader.Read(@"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam");
+var globalVariables = gam.Variables.Select(s => (name: s.Name.ToString().Trim('\0'), value: s.ValueInt)).ToList();
+
+
 var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "PPDILI.DLG").First();
 
-var myself = new Creature();
-myself.HP = 100;
-myself.Items.Add("test");
+var myself = new CreFile();
+myself.CurrentHP = 100;
+//myself.Items.Add("test");
 
-var globalState = new List<(string name, int value)>();
-globalState.Add(("test", 1));
-globalState.Add(("OHN_dili", 1));
+//var globalState = new List<(string name, int value)>();
+//globalState.Add(("test", 1));
+//globalState.Add(("OHN_dili", 1));
 
 var area = new Area();
 area.AreaCode = "AR1234";
@@ -21,10 +28,11 @@ area.AreaCode = "AR1234";
 var idsProcessor = new IdsProcessor();
 var objectLocator = new ObjectLocator();
 objectLocator.Myself = myself;
+objectLocator.Party = gam.PartyMembers;
 
-var toady = new Creature();
-toady.ScriptName = "arntra03";
-toady.State = 1;
+var toady = new CreFile();
+toady.DeathVariable = new array32("arntra03");
+toady.StatusFlags.Sleeping = true;
 objectLocator.AllCreatures.Add(toady);
 
 var foundEntryState = false;
@@ -36,19 +44,15 @@ if (d.states.Any(a => a.Weight > 0))
 
 var tp = new TriggerProcessor(objectLocator, idsProcessor);
 tp.Area = area;
-tp.GlobalState = globalState;
+tp.GlobalState = globalVariables;
+tp.Game = gam;
 
-var currentState = 0;
+var currentStateNumber = 0;
 foreach (var state in d.states)
 {
-	//Console.Write($"Checking state {state.StateNumber}");
 	var valid = false;
 	if (String.IsNullOrEmpty(state.Trigger))
 	{
-		//valid = true;
-		//Console.WriteLine();
-		//Console.WriteLine(" Not a top level state (no trigger)");
-		//Console.WriteLine();
 		continue;
 	}
 	else
@@ -56,9 +60,7 @@ foreach (var state in d.states)
 		Console.WriteLine($"State {state.StateNumber} (weight {state.Weight})");
 		var trigger = state.Trigger;
 
-		var triggers = trigger.Split([")"], StringSplitOptions.None)
-								  .Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
-								  .ToArray();
+		var triggers = SplitTriggers(trigger);
 
 		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}
@@ -66,57 +68,86 @@ foreach (var state in d.states)
 	if (valid)
 	{
 		tp.selectedRandom = -1;
-		currentState = state.StateNumber;
+		currentStateNumber = state.StateNumber;
 		foundEntryState = true;
-		Console.WriteLine($"{state.ResponseText.Text} ({state.ResponseText.Strref})");
-		for (int i = 0; i < state.transitions.Count; i++)
-		{
-			if (state.transitions[i].HasTrigger)
-			{
-				var responseTriggers = state.transitions[i].Trigger.Split([")"], StringSplitOptions.None)
-						  .Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
-						  .ToArray();
-
-				var validResponse = EvaluateTriggers<TriggerProcessor>(responseTriggers, tp, game.Identifiers);
-				if (state.transitions[i].HasText)
-				{
-					Console.WriteLine($" - [{i}] {state.transitions[i].TransitionText.Text}");
-				}
-			}
-			else
-			{
-				if (state.transitions[i].HasText)
-				{
-					Console.WriteLine($" - [{i}] {state.transitions[i].TransitionText.Text}");
-				}
-			}
-		}
 		break;
 	}
 }
-
-
-//TODO: User enters a number to select a response, then we run the actions associated with that response
-
-var selected = Convert.ToInt32(Console.ReadLine());
-
-var actionText = d.states[Convert.ToInt32(currentState)].transitions[selected].Action;
-
-Console.WriteLine("Actions");
-var ap = new ActionProcessor(objectLocator, idsProcessor);
-var actions = actionText.Split([")"], StringSplitOptions.None)
-						.Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
-						.ToArray();
-var done = EvaluateTriggers<ActionProcessor>(actions, ap, game.Identifiers);
-
-Console.WriteLine();
-
 
 if (!foundEntryState)
 {
 	Console.WriteLine("Target has no valid dialog");
 }
+else
+{
+	var ap = new ActionProcessor(objectLocator, idsProcessor);
+	ap.Area = area;
+	ap.Creature = myself;
 
+	DlgFile currentDlg = d;
+	var dialogDone = false;
+
+	void ProcessTransition(Transition2 t)
+	{
+		if (t.HasAction && !string.IsNullOrEmpty(t.Action))
+		{ 
+			EvaluateTriggers<ActionProcessor>(SplitTriggers(t.Action), ap, game.Identifiers);
+		}
+
+		if (t.TerminateDialog)
+		{
+			dialogDone = true;
+			return;
+		}
+
+		var nextDlg = LookupDlg(game.Dialogs, t.Dialog) ?? currentDlg;
+		currentDlg = nextDlg;
+		currentStateNumber = t.NextState;
+	}
+
+	while (!dialogDone)
+	{
+		var state = LookupState(currentDlg, currentStateNumber);
+		if (state == null)
+		{
+			Console.WriteLine("[State not found]");
+			break;
+		}
+
+		Console.WriteLine($"{state.ResponseText.Text} ({state.ResponseText.Strref})");
+
+		var validTransitions = state.transitions
+			.Where(t => !t.HasTrigger ||
+				         EvaluateTriggers<TriggerProcessor>(SplitTriggers(t.Trigger), tp, game.Identifiers))
+			.ToList();
+
+		if (!validTransitions.Any())
+		{
+			Console.WriteLine("[No valid responses]");
+			break;
+		}
+
+		if (validTransitions.Count == 1 && !validTransitions[0].HasText)
+		{
+			ProcessTransition(validTransitions[0]);
+			continue;
+		}
+
+		for (int i = 0; i < validTransitions.Count; i++)
+		{
+			if (validTransitions[i].HasText)
+			{
+				Console.WriteLine($" - [{i}] {validTransitions[i].TransitionText.Text}");
+			}
+		}
+
+		Console.Write("> ");
+		var selected = Convert.ToInt32(Console.ReadLine());
+		ProcessTransition(validTransitions[selected]);
+	}
+
+	Console.WriteLine();
+}
 
 ////var triggerText = "Global(\"Lumbar_Huff\", \"GLOBAL\", 1)Global(\"Know_L\r\numbar\", \"GLOBAL\", 0)";
 //var triggerText = "AreaCheck(\"AR1234\")Global(\"test\", \"global\", 1)HP(Myself, 100)InParty(Myself)PartyHasItem(\"test\")";
@@ -168,6 +199,25 @@ if (!foundEntryState)
 //    EvaluateTriggers<ActionProcessor>(actions, ap);
 //}
 
+
+static string[] SplitTriggers(string text)
+{
+	if (string.IsNullOrEmpty(text))
+		return [];
+	return text.Split([")"], StringSplitOptions.None)
+		.Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
+		.ToArray();
+}
+
+static State2 LookupState(DlgFile dlg, int stateNumber) => dlg.states.SingleOrDefault(s => s.StateNumber == stateNumber);
+
+static DlgFile LookupDlg(IEnumerable<DlgFile> dialogs, array8 resref)
+{
+	var name = resref.ToString().ToUpperInvariant();
+	if (string.IsNullOrEmpty(name))
+		return null;
+	return dialogs.SingleOrDefault(d => Path.GetFileNameWithoutExtension(d.Filename).ToUpperInvariant() == name);
+}
 
 static bool EvaluateTriggers<T>(string[] methods, object o, List<IdsFile> idsFiles)
 {
@@ -226,10 +276,6 @@ static bool EvaluateTriggers<T>(string[] methods, object o, List<IdsFile> idsFil
 			i++;
 		}
 
-
-
-		//parameters.Replace("STATE_SLEEPING", "1"); //TEMP
-
 		var method = typeof(T).GetMethod(methodName);
 
 		if (method != null)
@@ -245,7 +291,7 @@ static bool EvaluateTriggers<T>(string[] methods, object o, List<IdsFile> idsFil
 				result = !result;
 			}
 
-			Console.WriteLine($"  {(inverted ? "!" : string.Empty)}{methodName} {String.Join(",", parametersString.Split(',').Select(p => p.Trim()).ToArray())} -> {result}");
+			//Console.WriteLine($"  {(inverted ? "!" : string.Empty)}{methodName} {String.Join(",", parametersString.Split(',').Select(p => p.Trim()).ToArray())} -> {result}");
 
 			if (result != true)
 			{
