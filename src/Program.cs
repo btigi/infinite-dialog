@@ -1,10 +1,9 @@
-﻿using System.Formats.Tar;
-using ii.InfinityEngine;
+﻿using ii.InfinityEngine;
 using ii.InfinityEngine.Files;
 using ii.InfinityEngine.Readers;
 
 var game = new Game("D:\\Games\\ie\\bg2ee", "D:\\Games\\ie\\bg2ee\\lang\\en_US");
-game.LoadResources([IEFileType.Dlg, IEFileType.Ids]);
+game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray]);
 
 var gamReader = new GamFileBinaryReader();
 gamReader.TlkFile = game.Tlk;
@@ -42,7 +41,7 @@ if (d.states.Any(a => a.Weight > 0))
 	d.states = d.states.OrderBy(o => o.Weight).ToList();
 }
 
-var tp = new TriggerProcessor(objectLocator, idsProcessor);
+var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays);
 tp.Area = area;
 tp.GlobalState = globalVariables;
 tp.Game = gam;
@@ -61,6 +60,9 @@ foreach (var state in d.states)
 		var trigger = state.Trigger;
 
 		var triggers = SplitTriggers(trigger);
+
+		triggers = new string[1];
+		triggers[0] = "CheckStatGT(\"MINSC\", 10, \"STR\")";
 
 		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}

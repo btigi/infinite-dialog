@@ -12,10 +12,14 @@ public class ObjectLocator()
         {
             return (CreFile)method.GetValue(this);
         }
+		else if (Party.Any(creature => creature.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()))
+		{
+			return Party.Where(creature => creature.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()).Single().CreFile;
+		}
         else if (AllCreatures.Any(creature => creature.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()))
         {
             return AllCreatures.Where(creature => creature.DeathVariable.ToString().Trim('\0').ToUpper() == obj.ToUpper()).Single();
-		}
+        }
         return null;
     }
 

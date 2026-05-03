@@ -44,17 +44,17 @@ public class ActionProcessor
         return true;
     }
 
-    public bool Dialog(string @object)
+    public bool Dialog(string obj)
     {
         return true;
     }
 
-    public bool Dialogue(string @object)
+    public bool Dialogue(string obj)
     {
-        return Dialog(@object);
+        return Dialog(obj);
     }
 
-    public bool DropItem(string @object, string location)
+    public bool DropItem(string obj, string location)
     {
         return true;
     }
@@ -64,19 +64,64 @@ public class ActionProcessor
         return true;
     }
 
-    public bool FindTraps()
+	public bool EquipItem(string obj)
+	{
+		return true;
+	}
+
+	public bool EquipItemEx(string obj, int slot)
+	{
+		return true;
+	}
+
+	public bool FindTraps()
     {
         return true;
     }
 
-    public bool GetItems(string @object, string target)
+    public bool GetItem(string obj, string target)
     {
         return true;
     }
 
+	public bool GiveItem(string obj, string target)
+	{
+		return true;
+	}
 
-    public bool JoinParty(string input, int other)
+	public bool Giveorder(string obj, int order)
+	{
+		return true;
+	}
+
+	public bool Help()
+	{
+		return true;
+	}
+
+	public bool Hide()
+	{
+		return true;
+	}
+
+	public bool JoinParty()
     {
         return true;
-    }
+	}
+
+	public bool LayOnHands(string target)
+	{
+		return true;
+	}
+
+	public bool LeaveParty()
+	{
+		return true;
+	}
+
+
+	public bool SetGlobal(string name, string area, int type)
+	{
+		return true;
+	}
 }
