@@ -15,7 +15,7 @@
     public Creature Creature { get; set; }
     public List<(string name, int value)> GlobalState = new();
 
-    public bool Acquired(string resRef)
+	public bool Acquired(string resRef)
     {
         return false;
     }
@@ -307,12 +307,36 @@
 
     public bool GlobalGT(string name, string area, int value)
     {
-        return false;
+		if (area == "global")
+		{
+			return this.GlobalState.SingleOrDefault(w => w.name == name).value > value;
+		}
+		if (area == "area")
+		{
+			return this.Area.Variables.Count(w => w.variable == name && w.value > value) == 1;
+		}
+		if (area == "locals")
+		{
+			//
+		}
+		return false;
     }
 
     public bool GlobalLT(string name, string area, int value)
     {
-        return false;
+		if (area == "global")
+		{
+			return this.GlobalState.SingleOrDefault(w => w.name == name).value < value;
+		}
+		if (area == "area")
+		{
+			return this.Area.Variables.Count(w => w.variable == name && w.value < value) == 1;
+		}
+		if (area == "locals")
+		{
+			//
+		}
+		return false;
     }
 
     public bool OnCreation()
@@ -326,6 +350,12 @@
         return (creature.State & state) > 0;
     }
 
+    //public bool StateCheck(string obj, string state)
+    //{
+    //    var stateId = idsProcessor.GetIdsValue("state.ids", state);
+    //    return StateCheck(obj, stateId);
+    //}
+
     public bool NotStateCheck(string obj, int state)
     {
         var creature = objectLocator.GetObject(obj);
@@ -334,7 +364,7 @@
 
     public bool NumTimesTalkedTo(int num)
     {
-        return false;
+        return true;
     }
 
     public bool NumTimesTalkedToGT(int num)
@@ -410,19 +440,34 @@
         return false;
     }
 
-    public bool RandomNum(int range, int value)
+
+    public int selectedRandom = -1;
+
+	public bool RandomNum(int range, int value)
     {
-        return random.Next(1, range) == value;
+        if (selectedRandom == -1)
+        {
+            selectedRandom = random.Next(1, range);
+        }
+        return selectedRandom == value;
     }
 
     public bool RandomNumGT(int range, int value)
     {
-        return random.Next(1, range) > value;
+		if (selectedRandom == -1)
+		{
+			selectedRandom = random.Next(1, range);
+		}
+		return selectedRandom > value;
     }
 
     public bool RandomNumLT(int range, int value)
     {
-        return random.Next(1, range) < value;
+		if (selectedRandom == -1)
+		{
+			selectedRandom = random.Next(1, range);
+		}
+		return selectedRandom < value;
     }
 
     public bool Died(string obj)
@@ -1101,4 +1146,10 @@
     {
         return false;
     }
+
+
+	public bool IfValidForPartyDialog(int amount)
+	{
+		return true;
+	}	
 }

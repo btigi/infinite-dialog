@@ -10,6 +10,10 @@
         {
             return (Creature)method.GetValue(this);
         }
+        else if (AllCreatures.Any(creature => creature.ScriptName == obj))
+        {
+            return AllCreatures.Where(creature => creature.ScriptName == obj).Single();
+		}
         return null;
     }
 
