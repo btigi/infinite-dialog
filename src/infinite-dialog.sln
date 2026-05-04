@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iedlg", "iedlg.csproj", "{2DDB464F-DFD9-44D7-BAF7-E7905CC0B573}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "infinite-dialog", "infinite-dialog.csproj", "{2DDB464F-DFD9-44D7-BAF7-E7905CC0B573}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ii.InfinityEngine", "..\..\..\ie\iiInfinityEngine\src\ii.InfinityEngine.csproj", "{A91995C8-0E94-2822-2DA2-66921AF51CB0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ii.InfinityEngine", "..\..\iiInfinityEngine\src\ii.InfinityEngine.csproj", "{A91995C8-0E94-2822-2DA2-66921AF51CB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

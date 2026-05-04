@@ -531,7 +531,7 @@ public class TriggerProcessor
 			case 7:
 				return creature.Thac0 > value;
 			case 8:
-				// TODO: number of attacks
+				// TODO: number of attacks - calculate
 				return false;
 			case 9:
 				return creature.SaveVsDeath > value;
@@ -607,7 +607,46 @@ public class TriggerProcessor
 				return creature.XPReward > value; //TODO: Probably not the same as #43
 			case 45:
 				return creature.Gold > value;
-				//TODO: Expand this list
+			case 46:
+				return creature.MoraleBreak > value;
+			case 47:
+				return creature.MoraleRecoveryTime > value;
+			case 48:
+				return creature.Reputation > value;
+			case 49:
+				return creature.RacialEnemy > value;
+			//case 50:
+			//	return DamageBonus > value; //TODO: calculate?
+			case 51:
+				//TODO: what if there are multiple spell failure effects
+				//TODO: calculate - better way of checking effects1 and effects2
+				var mageSpellFailure = creature.Effects1.Where(w => w.Opcode == 60 && (w.Parameter2 == 0 || w.Parameter2 == 3)).Select(s => s.Parameter1).FirstOrDefault();
+				mageSpellFailure = creature.Effects2.Where(w => w.Opcode == 60 && (w.Parameter2 == 0 || w.Parameter2 == 3)).Select(s => s.Parameter1).FirstOrDefault();
+				return mageSpellFailure > value;
+			case 52:
+				//TODO: what if there are multiple spell failure effects
+				//TODO: calculate - better way of checking effects1 and effects2
+				var clericSpellFailure = creature.Effects1.Where(w => w.Opcode == 60 && (w.Parameter2 == 1 || w.Parameter2 == 4)).Select(s => s.Parameter1).FirstOrDefault();
+				clericSpellFailure = creature.Effects2.Where(w => w.Opcode == 60 && (w.Parameter2 == 1 || w.Parameter2 == 4)).Select(s => s.Parameter1).FirstOrDefault();
+				return clericSpellFailure > value;
+			//case 53:
+			//	return SpellDurationModifierMage > value; //TODO: calculate
+			//case 54:
+			//	return SpellDurationModifierPriest > value; //TODO: calculate
+			case 55:
+				return creature.TurnUndead > value;
+			//case 56:
+			//	return BackstabMultiplier > value; //TODO: calculate
+			//case 57:
+			//	return LayOnHandsAmount > value; //TODO: calculate
+
+			//TODO: Expand this list
+
+			case 202:
+				//TODO: calculate - better way of checking effects1 and effects2
+				var ignoreDrainDeath = creature.Effects1.Where(w => w.Opcode == 367 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				ignoreDrainDeath = creature.Effects2.Where(w => w.Opcode == 367 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				return ignoreDrainDeath > 0;
 		}
 		return false;
 	}
@@ -1153,11 +1192,28 @@ public class TriggerProcessor
 		return false;
 	}
 
+	public bool IfValidForPartyDialogue(string obj)
+	{
+		return IfValidForPartyDialog(obj);
+	}
+
 	public bool IsValidForPartyDialog(string obj)
 	{
 		// obj is in the party
 		// obj is not dead
-		return false;
+		return IfValidForPartyDialog(obj);
+	}
+
+	public bool IfValidForPartyDialog(string obj)
+	{
+		//var creature = this.objectLocator.Party.Where(w => w.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj).SingleOrDefault();
+		//return creature != null;
+		return true;
+	}
+
+	public bool IsValidForPartyDialogue(string obj)
+	{
+		return IfValidForPartyDialog(obj);
 	}
 
 	public bool PartyHasItemIdentified(string resRef)
@@ -1326,40 +1382,44 @@ public class TriggerProcessor
 	}
 
 
-	public bool IfValidForPartyDialog(string obj)
+	public bool IsWeaponRanged(string obj)
 	{
-		var creature = this.objectLocator.Party.Where(w => w.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj).SingleOrDefault();
-		return creature != null;
+		return false;
 	}
 
-	public bool IsValidForPartyDialogue(string obj)
+	public bool ButtonDisabled(int button)
 	{
-		return IfValidForPartyDialog(obj);
+		return false;
 	}
 
+	public bool HasItemCategory(string obj, int itemtype, bool equipped)
+	{
+		return false;
+	}
 
-//IsWeaponRanged(O:Object*)
-//ButtonDisabled(I:Button* BUTTON)
-//HasItemCategory(O:Object*, I:Itemtype* ITEMCAT, I:Equipped* BOOLEAN)
-//NightmareModeOn()
-//OriginalClass(O:Object*, I:Class* CLASS)
-//CutSceneBroken()
-//WeaponEffectiveVs(O:Object*, I:Hand* HAND)
-//INI(S:Name*, I:Number*)
-//ModalStateObject(O:Object*, I:ModalState* Modal)
-//WeaponCanDamage(O:Object*, I:Hand* HAND)
-//NumKilledByParty(I:Number*)
-//NumKilledByPartyGT(I:Number*)
-//NumKilledByPartyLT(I:Number*)
-//CanTurn(O:Object*, I:Difference*)
-//BitCheck(S:Name*, S:Area*, I:Bit* Bits)
-//CanEquipRanged()
-//ImmuneToSpellLevel(O:Object*, I:Level*
-//StoryModeOn()
-//IsForcedRandomEncounterActive(S:Area*)
-//ClassLevel(O:Object*, I:Category* CLASSCAT, I:Value*)
-//ClassLevelGT(O:Object*, I:Category* CLASSCAT, I:Value*)
-//ClassLevelLT(O:Object*, I:Category* CLASSCAT, I:Value*)
+	public bool NightmareModeOn()
+	{
+		return false;
+	}
+
+	//OriginalClass(O:Object*, I:Class* CLASS)
+	//CutSceneBroken()
+	//WeaponEffectiveVs(O:Object*, I:Hand* HAND)
+	//INI(S:Name*, I:Number*)
+	//ModalStateObject(O:Object*, I:ModalState* Modal)
+	//WeaponCanDamage(O:Object*, I:Hand* HAND)
+	//NumKilledByParty(I:Number*)
+	//NumKilledByPartyGT(I:Number*)
+	//NumKilledByPartyLT(I:Number*)
+	//CanTurn(O:Object*, I:Difference*)
+	//BitCheck(S:Name*, S:Area*, I:Bit* Bits)
+	//CanEquipRanged()
+	//ImmuneToSpellLevel(O:Object*, I:Level*
+	//StoryModeOn()
+	//IsForcedRandomEncounterActive(S:Area*)
+	//ClassLevel(O:Object*, I:Category* CLASSCAT, I:Value*)
+	//ClassLevelGT(O:Object*, I:Category* CLASSCAT, I:Value*)
+	//ClassLevelLT(O:Object*, I:Category* CLASSCAT, I:Value*)
 
 	public bool SecretDoorDetected(string obj, int open)
 	{
@@ -1389,7 +1449,7 @@ public class TriggerProcessor
 	public bool Proficiency(string obj, int slot, int value)
 	{
 		var creature = objectLocator.GetObject(obj);
-		
+
 		if (creature == null)
 			return false;
 

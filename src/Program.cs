@@ -3,7 +3,7 @@ using ii.InfinityEngine.Files;
 using ii.InfinityEngine.Readers;
 
 var game = new Game("D:\\Games\\ie\\bg2ee", "D:\\Games\\ie\\bg2ee\\lang\\en_US");
-game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray]);
+game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray, IEFileType.Cre]);
 
 var gamReader = new GamFileBinaryReader();
 gamReader.TlkFile = game.Tlk;
@@ -11,7 +11,8 @@ var gam = gamReader.Read(@"C:\Users\igi\Downloads\baldursgate2shadowsofamn_saveg
 var globalVariables = gam.Variables.Select(s => (name: s.Name.ToString().Trim('\0'), value: s.ValueInt)).ToList();
 
 
-var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "PPDILI.DLG").First();
+//var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "PPDILI.DLG").First();
+var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "MOOK.DLG").First();
 
 var myself = new CreFile();
 myself.CurrentHP = 100;
@@ -46,6 +47,16 @@ tp.Area = area;
 tp.GlobalState = globalVariables;
 tp.Game = gam;
 
+var x = Path.ChangeExtension(d.Filename.ToString().Trim('\0').ToUpper(), "").TrimEnd('.');
+var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
+if (c != null)
+{
+	var existingColour = Console.ForegroundColor;
+	Console.ForegroundColor = ConsoleColor.Blue;
+	Console.WriteLine($"{c.ShortName.Text}");
+	Console.ForegroundColor = existingColour;
+}
+
 var currentStateNumber = 0;
 foreach (var state in d.states)
 {
@@ -61,8 +72,8 @@ foreach (var state in d.states)
 
 		var triggers = SplitTriggers(trigger);
 
-		triggers = new string[1];
-		triggers[0] = "CheckStatGT(\"MINSC\", 10, \"STR\")";
+		//triggers = new string[1];
+		//triggers[0] = "CheckStatGT(\"MINSC\", 10, \"STR\")";
 
 		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}
@@ -92,7 +103,7 @@ else
 	void ProcessTransition(Transition2 t)
 	{
 		if (t.HasAction && !string.IsNullOrEmpty(t.Action))
-		{ 
+		{
 			EvaluateTriggers<ActionProcessor>(SplitTriggers(t.Action), ap, game.Identifiers);
 		}
 
@@ -100,6 +111,16 @@ else
 		{
 			dialogDone = true;
 			return;
+		}
+
+		var x = t.Dialog.ToString().Trim('\0').ToUpper();
+		var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
+		if (c != null)
+		{
+			var existingColour = Console.ForegroundColor;
+			Console.ForegroundColor = ConsoleColor.Blue;
+			Console.WriteLine($"{c.ShortName.Text}");
+			Console.ForegroundColor = existingColour;
 		}
 
 		var nextDlg = LookupDlg(game.Dialogs, t.Dialog) ?? currentDlg;
@@ -120,7 +141,7 @@ else
 
 		var validTransitions = state.transitions
 			.Where(t => !t.HasTrigger ||
-				         EvaluateTriggers<TriggerProcessor>(SplitTriggers(t.Trigger), tp, game.Identifiers))
+						 EvaluateTriggers<TriggerProcessor>(SplitTriggers(t.Trigger), tp, game.Identifiers))
 			.ToList();
 
 		if (!validTransitions.Any())
@@ -253,29 +274,36 @@ static bool EvaluateTriggers<T>(string[] methods, object o, List<IdsFile> idsFil
 		var triggerDefinition = idsFiles.Single(s => s.Filename.ToUpper() == "TRIGGER.IDS");
 		var triggers = triggerDefinition.contents.Split("\r\n");
 		// Note: This .First() means we don't support overloads
-		var thisTrigger = triggers.Where(w => w.Contains($" {methodName}(")).First(); // e.g. "0x400F Global(S:Name*,S:Area*,I:Value*)"
-		var triggerParameters = thisTrigger.Substring(thisTrigger.IndexOf("(")).Trim(['(', ')']).Split(',');
-
-		var i = 0;
-		foreach (var p in triggerParameters)
+		try
 		{
-			if (p.Contains('*') && !p.EndsWith('*'))
+			var thisTrigger = triggers.Where(w => w.Contains($" {methodName}(")).First(); // e.g. "0x400F Global(S:Name*,S:Area*,I:Value*)"
+			var triggerParameters = thisTrigger.Substring(thisTrigger.IndexOf("(")).Trim(['(', ')']).Split(',');
+
+			var i = 0;
+			foreach (var p in triggerParameters)
 			{
-				var ids = p.Substring(p.LastIndexOf('*'));
-				var relevantIds = idsFiles.Where(w => w.Filename.ToUpper().Replace(".IDS", "") == ids.ToUpper().Replace("*", "")).First();
-				var lines = relevantIds.contents.Split("\r\n");
-
-				var actualTrigger = parameters[i].Replace("\"", "");
-
-				var line = lines.Where(w => w.EndsWith(actualTrigger)).First();
-				var value = line.Split(" ")[0];
-				parameters[i] = value;
-				if (value.StartsWith("0x"))
+				if (p.Contains('*') && !p.EndsWith('*'))
 				{
-					parameters[i] = Convert.ToString(Convert.ToInt32(value, 16));
+					var ids = p.Substring(p.LastIndexOf('*'));
+					var relevantIds = idsFiles.Where(w => w.Filename.ToUpper().Replace(".IDS", "") == ids.ToUpper().Replace("*", "")).First();
+					var lines = relevantIds.contents.Split("\r\n");
+
+					var actualTrigger = parameters[i].Replace("\"", "");
+
+					var line = lines.Where(w => w.EndsWith(actualTrigger)).First();
+					var value = line.Split(" ")[0];
+					parameters[i] = value;
+					if (value.StartsWith("0x"))
+					{
+						parameters[i] = Convert.ToString(Convert.ToInt32(value, 16));
+					}
 				}
+				i++;
 			}
-			i++;
+		}
+		catch
+		{
+			//TODO:
 		}
 
 		var method = typeof(T).GetMethod(methodName);

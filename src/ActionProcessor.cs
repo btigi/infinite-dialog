@@ -119,9 +119,34 @@ public class ActionProcessor
 		return true;
 	}
 
+	public bool MoveToObject(string obj)
+	{
+		return true;
+	}
+
+	public bool MoveToPoint(string point)
+	{
+		return true;
+	}
+
+	public bool Panic()
+	{
+		return true;
+	}
+
+	public bool PickPockets(string obj)
+	{
+		return true;
+	}
+
 
 	public bool SetGlobal(string name, string area, int type)
 	{
 		return true;
 	}
+
+	public bool SetNumTimesTalkedTo(int num)
+	{
+		return true;
+	}	
 }
