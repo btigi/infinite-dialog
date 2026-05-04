@@ -6,13 +6,20 @@ public class TriggerProcessor
 	private readonly IdsProcessor idsProcessor;
 	private List<StoFile> stores;
 	private readonly Random random;
+	private List<ItmFile> items;
+	private GamFile game;
+	private TlkFile tlk;
 
-	public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor, List<DimensionalArrayFile> dimensionalArrayFiles, List<StoFile> stores)
+	public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor, List<DimensionalArrayFile> dimensionalArrayFiles, List<StoFile> stores, List<ItmFile> items,
+							GamFile game, TlkFile tlk)
 	{
 		this.objectLocator = objectLocator;
 		this.idsProcessor = idsProcessor;
 		this.dimensionalArrayFiles = dimensionalArrayFiles;
 		this.stores = stores;
+		this.items = items;
+		this.game = game;
+		this.tlk = tlk;
 		random = new Random();
 	}
 
@@ -608,7 +615,7 @@ public class TriggerProcessor
 
 				if (slotItem == targetItem)
 					return true;
-				
+
 				var store = stores.Where(w => w.Filename.ToString().ToUpper().Trim('\0').TrimEnd(".STO") == slotItem).FirstOrDefault();
 				if (store != null)
 				{
@@ -760,10 +767,30 @@ public class TriggerProcessor
 			//case 56:
 			//	return BackstabMultiplier > value; //TODO: calculate
 			//case 57:
-			//	return LayOnHandsAmount > value; //TODO: calculate
+			//	return LayOnHandsAmount > value; //TODO: calculate - look up creature's level in layonhands.2da
 
 			//TODO: Expand this list
 
+			case 148:
+				var exploreV1 = creature.Effects1.Where(w => w.Opcode == 268).Select(s => s.Parameter1).FirstOrDefault();
+				var exploreV2 = creature.Effects2.Where(w => w.Opcode == 268).Select(s => s.Parameter1).FirstOrDefault();
+				return exploreV1 != 0 || exploreV2 != 0;
+
+			case 187:
+				var immuneToTurnUndeadV1 = creature.Effects1.Where(w => w.Opcode == 297 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				var immuneToTurnUndeadV2 = creature.Effects2.Where(w => w.Opcode == 297 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				return immuneToTurnUndeadV1 != 0 || immuneToTurnUndeadV2 != 0;
+
+			case 191:
+				var useAnyItemV1 = creature.Effects1.Where(w => w.Opcode == 302 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				var useAnyItemV2 = creature.Effects2.Where(w => w.Opcode == 302 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				return useAnyItemV1 != 0 || useAnyItemV2 != 0;
+
+			case 201:
+				//TODO: calculate - better way of checking effects1 and effects2
+				var doNotDraw = creature.Effects1.Where(w => w.Opcode == 315 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				doNotDraw = creature.Effects2.Where(w => w.Opcode == 315 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
+				return doNotDraw > 0;
 			case 202:
 				//TODO: calculate - better way of checking effects1 and effects2
 				var ignoreDrainDeath = creature.Effects1.Where(w => w.Opcode == 367 && w.Parameter2 != 0).Select(s => s.Parameter1).FirstOrDefault();
@@ -843,7 +870,7 @@ public class TriggerProcessor
 
 	public bool Dead(string name)
 	{
-		return false;
+		return Game.Variables.Where(w => w.Name.ToString().ToUpper().Trim('\0') == $"SPRITE_IS_DEAD{name}".ToUpper()).Any();
 	}
 
 	public bool Opened(string obj)
@@ -878,6 +905,30 @@ public class TriggerProcessor
 
 	public bool OutOfAmmo()
 	{
+		var slot = 35 + this.Creature.Items.SelectedWeapon;
+		switch (slot)
+		{
+			case 11:
+				return this.Creature.Items.Quiver1?.Charges1 == 0 || this.Creature.Items.Quiver1 == null;
+			case 12:
+				return this.Creature.Items.Quiver2?.Charges1 == 0 || this.Creature.Items.Quiver2 == null;
+			case 13:
+				return this.Creature.Items.Quiver3?.Charges1 == 0 || this.Creature.Items.Quiver3 == null;
+			case 14:
+				return this.Creature.Items.Quiver4?.Charges1 == 0 || this.Creature.Items.Quiver4 == null;
+
+			case 34:
+				return false;
+			case 35:
+				return false;
+			case 36:
+				return false;
+			case 37:
+				return false;
+			case 38:
+				return false;
+		}
+
 		return false;
 	}
 
@@ -923,8 +974,51 @@ public class TriggerProcessor
 
 	public bool HasItem(string resRef, string obj)
 	{
-		//var creature = objectLocator.GetObject(obj);
-		//return creature.Items.Any(a => a == resRef);
+		//TODO: Check for bag of holding etc.
+		var creature = objectLocator.GetObject(obj);
+		return
+			creature.Items.Helmet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Armor?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Shield?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Gloves?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.RingLeft?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.RingRight?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Amulet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Belt?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Boots?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Weapon1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Weapon2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Weapon3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Weapon4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Quiver1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Quiver2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Quiver3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Quiver4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.Cloak?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.QuickItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.QuickItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.QuickItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem5?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem6?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem7?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem8?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem9?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem10?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem11?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem12?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem13?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem14?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem15?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.InventoryItem16?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+			creature.Items.MagicWeapon?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper();
+	}
+
+	public bool HasItemType(string obj, int type, int ignoreDestructible)
+	{
 		return true;
 	}
 
@@ -940,7 +1034,12 @@ public class TriggerProcessor
 
 	public bool HasWeaponEquipped(string obj)
 	{
-		return false;
+		var creature = objectLocator.GetObject(obj);
+		return
+			creature.Items.Weapon1?.Filename != null ||
+			creature.Items.Weapon2?.Filename != null ||
+			creature.Items.Weapon3?.Filename != null ||
+			creature.Items.Weapon4?.Filename != null;
 	}
 
 	public bool Happiness(string obj, int amount)
@@ -1283,19 +1382,41 @@ public class TriggerProcessor
 		return false;
 	}
 
-	public bool CalendarDay(int day)
+	public bool CalanderDay(int day)
 	{
-		return false;
+		//var years2da = dimensionalArrayFiles.Where(w => w.Filename.ToUpper() == "YEARS.2DA").Single();
+		//var lines = years2da.Contents.Split("\r\n");
+		//var startTime = Convert.ToInt32(lines.Where(w => w.StartsWith("STARTTIME")).Single().Split(" ", StringSplitOptions.RemoveEmptyEntries).Last()) / 7200;
+		//var startYear = Convert.ToInt32(lines.Where(w => w.StartsWith("STARTYEAR")).Single().Split(" ", StringSplitOptions.RemoveEmptyEntries).Last());
+
+		//var months2da = dimensionalArrayFiles.Where(w => w.Filename.ToUpper() == "MONTHS.2DA").Single();
+		//lines = months2da.Contents.Split("\r\n").Skip(3).ToArray();
+
+
+		//var months = new List<(string, int)>();
+		//foreach (var line in lines)
+		//{
+		//	var parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+		//	if (parts.Length > 0)
+		//	{
+		//		months.Add((tlk.Strings[Convert.ToInt32(parts[2])].Text, Convert.ToInt32(parts[1])));
+		//	}
+		//}
+
+		var currentDays = game.GameTime / 7200;
+		return day == currentDays;
 	}
 
-	public bool CalendarDayGT(int day)
+	public bool CalandarDayGT(int day)
 	{
-		return false;
+		var currentDays = game.GameTime / 7200;
+		return day > currentDays;
 	}
 
-	public bool CalendarDayLT(int day)
+	public bool CalandarDayLT(int day)
 	{
-		return false;
+		var currentDays = game.GameTime / 7200;
+		return day < currentDays;
 	}
 
 	public bool Name(string name, string obj)

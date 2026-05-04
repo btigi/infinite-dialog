@@ -10,9 +10,9 @@ gamReader.TlkFile = game.Tlk;
 var gam = gamReader.Read(@"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam");
 var globalVariables = gam.Variables.Select(s => (name: s.Name.ToString().Trim('\0'), value: s.ValueInt)).ToList();
 
-
 //var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "PPDILI.DLG").First();
-var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "MOOK.DLG").First();
+//var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "MOOK.DLG").First();
+var d = game.Dialogs.Where(w => w.Filename.ToUpper() == "ABAZIGAL.DLG").First();
 
 var myself = new CreFile();
 myself.CurrentHP = 100;
@@ -42,10 +42,11 @@ if (d.states.Any(a => a.Weight > 0))
 	d.states = d.states.OrderBy(o => o.Weight).ToList();
 }
 
-var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores);
+var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores, game.Items, gam, game.Tlk);
 tp.Area = area;
 tp.GlobalState = globalVariables;
 tp.Game = gam;
+tp.Creature = gam.PartyMembers.First().CreFile;
 
 var x = Path.ChangeExtension(d.Filename.ToString().Trim('\0').ToUpper(), "").TrimEnd('.');
 var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
@@ -73,7 +74,7 @@ foreach (var state in d.states)
 		var triggers = SplitTriggers(trigger);
 
 		triggers = new string[1];
-		triggers[0] = "PartyHasItem(\"BAZPL004\")";
+		triggers[0] = "CalanderDay(1)";
 
 		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}
