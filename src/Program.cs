@@ -3,7 +3,7 @@ using ii.InfinityEngine.Files;
 using ii.InfinityEngine.Readers;
 
 var game = new Game("D:\\Games\\ie\\bg2ee", "D:\\Games\\ie\\bg2ee\\lang\\en_US");
-game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray, IEFileType.Cre]);
+game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray, IEFileType.Cre, IEFileType.Itm, IEFileType.Sto]);
 
 var gamReader = new GamFileBinaryReader();
 gamReader.TlkFile = game.Tlk;
@@ -42,7 +42,7 @@ if (d.states.Any(a => a.Weight > 0))
 	d.states = d.states.OrderBy(o => o.Weight).ToList();
 }
 
-var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays);
+var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores);
 tp.Area = area;
 tp.GlobalState = globalVariables;
 tp.Game = gam;
@@ -72,8 +72,8 @@ foreach (var state in d.states)
 
 		var triggers = SplitTriggers(trigger);
 
-		//triggers = new string[1];
-		//triggers[0] = "CheckStatGT(\"MINSC\", 10, \"STR\")";
+		triggers = new string[1];
+		triggers[0] = "PartyHasItem(\"BAZPL004\")";
 
 		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}

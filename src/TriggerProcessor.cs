@@ -4,13 +4,15 @@ public class TriggerProcessor
 {
 	private readonly ObjectLocator objectLocator;
 	private readonly IdsProcessor idsProcessor;
+	private List<StoFile> stores;
 	private readonly Random random;
 
-	public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor, List<DimensionalArrayFile> dimensionalArrayFiles)
+	public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor, List<DimensionalArrayFile> dimensionalArrayFiles, List<StoFile> stores)
 	{
 		this.objectLocator = objectLocator;
 		this.idsProcessor = idsProcessor;
 		this.dimensionalArrayFiles = dimensionalArrayFiles;
+		this.stores = stores;
 		random = new Random();
 	}
 
@@ -292,21 +294,91 @@ public class TriggerProcessor
 
 	public bool HaveSpell(int spell)
 	{
-		//return this.Creature.MemorisedSpells.PriestLevel7.First().Filename Contains(spell);
-		return true;
+		var spellString = Convert.ToString(spell);
+		var type = spellString.First();
+		var level = spellString.Skip(1).Take(1).First();
+		var spellId = spellString.Substring(spellString.Length - 3, 3);
+
+		return type switch
+		{
+			// cleric
+			'1' => level switch
+			{
+				'1' => this.Creature.MemorisedSpells.PriestLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'2' => this.Creature.MemorisedSpells.PriestLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'3' => this.Creature.MemorisedSpells.PriestLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'4' => this.Creature.MemorisedSpells.PriestLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'5' => this.Creature.MemorisedSpells.PriestLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'6' => this.Creature.MemorisedSpells.PriestLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'7' => this.Creature.MemorisedSpells.PriestLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				_ => false,
+			},
+			// mage
+			'2' => level switch
+			{
+				'1' => this.Creature.MemorisedSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'2' => this.Creature.MemorisedSpells.MageLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'3' => this.Creature.MemorisedSpells.MageLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'4' => this.Creature.MemorisedSpells.MageLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'5' => this.Creature.MemorisedSpells.MageLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'6' => this.Creature.MemorisedSpells.MageLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'7' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'8' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				'9' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				_ => false,
+			},
+			// innate
+			'3' => level switch
+			{
+				'1' => this.Creature.MemorisedSpells.Innate.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+				_ => false,
+			},
+			_ => false,
+		};
 	}
 
-	public bool HaveSpell(string spell)
+	public bool HaveSpellRES(string spell)
 	{
-		//var spellId = idsProcessor.GetIdsValue("spell.ids", spell);
-		//return this.Creature.MemorisedSpells.Contains(spellId);
-		return true;
+		return
+		  this.Creature.MemorisedSpells.PriestLevel1.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel2.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel3.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel4.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel5.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel6.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.PriestLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel2.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel3.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel4.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel5.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel6.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel8.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.MageLevel9.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+		  this.Creature.MemorisedSpells.Innate.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper());
 	}
 
 	public bool HaveAnySpells()
 	{
-		//return this.Creature.MemorisedSpells.Any();
-		return true;
+		return
+			this.Creature.MemorisedSpells.PriestLevel1.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel2.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel3.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel4.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel5.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel6.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.PriestLevel7.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel1.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel2.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel3.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel4.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel5.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel6.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel7.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel8.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.MageLevel9.Where(w => w.IsMemorised).Any() ||
+			this.Creature.MemorisedSpells.Innate.Where(w => w.IsMemorised).Any();
 	}
 
 	public bool BecameVisible()
@@ -316,34 +388,34 @@ public class TriggerProcessor
 
 	public bool GlobalGT(string name, string area, int value)
 	{
-		if (area == "global")
+		if (area.Equals("GLOBAL", StringComparison.CurrentCultureIgnoreCase))
 		{
 			return this.GlobalState.SingleOrDefault(w => w.name == name).value > value;
 		}
-		if (area == "area")
+		if (area.Equals("AREA", StringComparison.CurrentCultureIgnoreCase))
 		{
 			return this.Area.Variables.Count(w => w.variable == name && w.value > value) == 1;
 		}
-		if (area == "locals")
+		if (area.Equals("LOCALS", StringComparison.CurrentCultureIgnoreCase))
 		{
-			//
+			return this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name.ToUpper()).Select(s => s.Parameter1 > value).FirstOrDefault();
 		}
 		return false;
 	}
 
 	public bool GlobalLT(string name, string area, int value)
 	{
-		if (area == "global")
+		if (area.Equals("GLOBAL", StringComparison.CurrentCultureIgnoreCase))
 		{
 			return this.GlobalState.SingleOrDefault(w => w.name == name).value < value;
 		}
-		if (area == "area")
+		if (area.Equals("AREA", StringComparison.CurrentCultureIgnoreCase))
 		{
 			return this.Area.Variables.Count(w => w.variable == name && w.value < value) == 1;
 		}
-		if (area == "locals")
+		if (area.Equals("LOCALS", StringComparison.CurrentCultureIgnoreCase))
 		{
-			//
+			return this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name.ToUpper()).Select(s => s.Parameter1 < value).FirstOrDefault();
 		}
 		return false;
 	}
@@ -355,54 +427,109 @@ public class TriggerProcessor
 
 	public bool StateCheck(string obj, int state)
 	{
-		//var creature = objectLocator.GetObject(obj);
-		//return (creature.StatusFlags & state) > 0;
-		return true;
+		var creature = objectLocator.GetObject(obj);
+		if (creature == null)
+			return false;
+
+		var flagsInt = StatusFlagsToInt(creature.StatusFlags);
+		return (flagsInt & state) != 0;
 	}
 
-	//public bool StateCheck(string obj, string state)
-	//{
-	//    var stateId = idsProcessor.GetIdsValue("state.ids", state);
-	//    return StateCheck(obj, stateId);
-	//}
+	private static int StatusFlagsToInt(StatusFlags flags)
+	{
+		var value = 0;
+		if (flags.Sleeping) value |= 0x00000001;
+		if (flags.Berserk) value |= 0x00000002;
+		if (flags.Panic) value |= 0x00000004;
+		if (flags.Stunned) value |= 0x00000008;
+		if (flags.Invisible) value |= 0x00000010;
+		if (flags.Helpless) value |= 0x00000020;
+		if (flags.FrozenDeath) value |= 0x00000040;
+		if (flags.StoneDeath) value |= 0x00000080;
+		if (flags.ExplodingDeath) value |= 0x00000100;
+		if (flags.FlameDeath) value |= 0x00000200;
+		if (flags.AcidDeath) value |= 0x00000400;
+		if (flags.Dead) value |= 0x00000800;
+		if (flags.Silenced) value |= 0x00001000;
+		if (flags.Charmed) value |= 0x00002000;
+		if (flags.Poisoned) value |= 0x00004000;
+		if (flags.Hasted) value |= 0x00008000;
+		if (flags.Slowed) value |= 0x00010000;
+		if (flags.Infravision) value |= 0x00020000;
+		if (flags.Blind) value |= 0x00040000;
+		if (flags.Diseased) value |= 0x00080000;
+		if (flags.Feebleminded) value |= 0x00100000;
+		if (flags.Nondetection) value |= 0x00200000;
+		if (flags.ImprovedInvisibility) value |= 0x00400000;
+		if (flags.Bless) value |= 0x00800000;
+		if (flags.Chant) value |= 0x01000000;
+		if (flags.DrawUponHolyMight) value |= 0x02000000;
+		if (flags.Luck) value |= 0x04000000;
+		if (flags.Aid) value |= 0x08000000;
+		if (flags.ChantBad) value |= 0x10000000;
+		if (flags.Blur) value |= 0x20000000;
+		if (flags.MirrorImage) value |= 0x40000000;
+		if (flags.Confused) value |= unchecked((int)0x80000000);
+		return value;
+	}
 
 	public bool NotStateCheck(string obj, int state)
 	{
-		//var creature = objectLocator.GetObject(obj);      
-		//return (creature.StatusFlags & state) == 0;
-		return true;
+		var creature = objectLocator.GetObject(obj);
+		if (creature == null)
+			return true;
+
+		var flagsInt = StatusFlagsToInt(creature.StatusFlags);
+		return (flagsInt & state) == 0;
 	}
 
 	public bool NumTimesTalkedTo(int num)
 	{
-		// This is stored in the CRE field in the ARE file
+		//TODO: This is stored in the CRE field in the ARE file
 		return true;
 	}
 
 	public bool NumTimesTalkedToGT(int num)
 	{
-		// This is stored in the CRE field in the ARE file
+		//TODO: This is stored in the CRE field in the ARE file
 		return false;
 	}
 
 	public bool NumTimesTalkedToLT(int num)
 	{
-		// This is stored in the CRE field in the ARE file
+		//TODO: This is stored in the CRE field in the ARE file
 		return false;
 	}
 
 	public bool Reaction(string obj, int value)
 	{
+		var creature = objectLocator.GetObject(obj);
+		if (creature == null)
+			return false;
+
+		//TODO: Reaction = 10 + rmodchr + rmodrep (see rmodchr.2da and rmodrep.2da) - we need to get the party member's CHA and reputation
 		return false;
 	}
 
 	public bool ReactionGT(string obj, int value)
 	{
+		var creature = objectLocator.GetObject(obj);
+		if (creature == null)
+			return false;
+
+		//TODO: Reaction = 10 + rmodchr + rmodrep (see rmodchr.2da and rmodrep.2da) - we need to get the party member's CHA and reputation
+
 		return false;
 	}
 
 	public bool ReactionLT(string obj, int value)
 	{
+		var creature = objectLocator.GetObject(obj);
+		if (creature == null)
+			return false;
+
+		//TODO: Reaction = 10 + rmodchr + rmodrep (see rmodchr.2da and rmodrep.2da) - we need to get the party member's CHA and reputation
+
 		return false;
 	}
 
@@ -423,7 +550,6 @@ public class TriggerProcessor
 
 	public bool PartyHasItem(string item)
 	{
-		//TODO: Bag of holding etc.
 		if (string.IsNullOrEmpty(item))
 			return false;
 
@@ -476,21 +602,17 @@ public class TriggerProcessor
 
 			foreach (var slot in slots)
 			{
-				var filename = slot?.Filename.ToString().ToUpper().Trim('\0');
-				if (string.IsNullOrEmpty(filename))
+				var slotItem = slot?.Filename.ToString().ToUpper().Trim('\0');
+				if (string.IsNullOrEmpty(slotItem))
 					continue;
-
-				var slotItem = filename.Trim('\0').ToUpperInvariant();
 
 				if (slotItem == targetItem)
 					return true;
-
-				var dotIndex = slotItem.IndexOf('.');
-				if (dotIndex > 0)
+				
+				var store = stores.Where(w => w.Filename.ToString().ToUpper().Trim('\0').TrimEnd(".STO") == slotItem).FirstOrDefault();
+				if (store != null)
 				{
-					var noExt = slotItem.Substring(0, dotIndex);
-					if (noExt == targetItem)
-						return true;
+					return store.ItemsSoldByStore.Where(w => w.Filename.ToString().ToUpper().Trim('\0') == targetItem).Any();
 				}
 			}
 		}
@@ -500,8 +622,8 @@ public class TriggerProcessor
 
 	public bool InParty(string obj)
 	{
-		var creature = objectLocator.GetObject(obj);
-		return creature.DeathVariable.ToString().ToUpper().Trim('\0') == obj.ToUpper();
+		var creature = objectLocator.Party.Select(s => s.CreFile.DeathVariable.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+		return creature != null;
 	}
 
 	public bool CheckStat(string obj, int value, int statNum)
@@ -1381,9 +1503,120 @@ public class TriggerProcessor
 		return false;
 	}
 
+	public bool Difficulty(int amount)
+	{
+		return false;
+	}
 
-	//TODO: Additional triggers
+	public bool DifficultyGT(int amount)
+	{
+		return false;
+	}
 
+	public bool DifficultyLT(int amount)
+	{
+		return false;
+	}
+
+	public bool InPartyAllowDead(string obj)
+	{
+		return false;
+	}
+
+	public bool AreaCheckObject(string resref, string obj)
+	{
+		return false;
+	}
+
+	public bool ActuallyInCombat()
+	{
+		return false;
+	}
+
+	public bool WalkedToTrigger(string obj)
+	{
+		return false;
+	}
+
+	public bool LevelParty(int num)
+	{
+		return false;
+	}
+
+	public bool LevelPartyGT(int num)
+	{
+		return false;
+	}
+
+	public bool LevelPartyLT(int num)
+	{
+		return false;
+	}
+
+	public bool HaveSpellParty(int spell)
+	{
+		return false;
+	}
+
+	public bool AmIInWatchersKeepPleaseIgnoreTheLackOfApostophe()
+	{
+		return false;
+	}
+
+	public bool InWatchersKeep()
+	{
+		return false;
+	}
+
+	public bool AreaCheckAllegiance(int allegience)
+	{
+		return false;
+	}
+
+	public bool IsTouchGUI()
+	{
+		return false;
+	}
+
+	public bool HasDLC(string dlcName)
+	{
+		return false;
+	}
+
+	public bool BeenInParty(string name)
+	{
+		return false;
+	}
+
+	public bool NextTriggerObject(string obj)
+	{
+		return false;
+	}
+
+	public bool ExtendedStateCheck(string obj, int state)
+	{
+		return false;
+	}
+
+	public bool CheckSpellState(string obj, int state)
+	{
+		return false;
+	}
+
+	public bool NearLocation(string obj, int pointX, int pointY, int range)
+	{
+		return false;
+	}
+
+	public bool NearSavedLocation(string obj, string global, int range)
+	{
+		return false;
+	}
+
+	public bool Switch(string global, string area)
+	{
+		return false;
+	}
 
 	public bool IsWeaponRanged(string obj)
 	{
