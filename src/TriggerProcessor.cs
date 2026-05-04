@@ -10,8 +10,8 @@ public class TriggerProcessor
 	{
 		this.objectLocator = objectLocator;
 		this.idsProcessor = idsProcessor;
-		random = new Random();
 		this.dimensionalArrayFiles = dimensionalArrayFiles;
+		random = new Random();
 	}
 
 	public Area Area { get; set; }
@@ -1382,6 +1382,9 @@ public class TriggerProcessor
 	}
 
 
+	//TODO: Additional triggers
+
+
 	public bool IsWeaponRanged(string obj)
 	{
 		return false;
@@ -1402,24 +1405,103 @@ public class TriggerProcessor
 		return false;
 	}
 
-	//OriginalClass(O:Object*, I:Class* CLASS)
-	//CutSceneBroken()
-	//WeaponEffectiveVs(O:Object*, I:Hand* HAND)
-	//INI(S:Name*, I:Number*)
-	//ModalStateObject(O:Object*, I:ModalState* Modal)
-	//WeaponCanDamage(O:Object*, I:Hand* HAND)
-	//NumKilledByParty(I:Number*)
-	//NumKilledByPartyGT(I:Number*)
-	//NumKilledByPartyLT(I:Number*)
-	//CanTurn(O:Object*, I:Difference*)
-	//BitCheck(S:Name*, S:Area*, I:Bit* Bits)
-	//CanEquipRanged()
-	//ImmuneToSpellLevel(O:Object*, I:Level*
-	//StoryModeOn()
-	//IsForcedRandomEncounterActive(S:Area*)
-	//ClassLevel(O:Object*, I:Category* CLASSCAT, I:Value*)
-	//ClassLevelGT(O:Object*, I:Category* CLASSCAT, I:Value*)
-	//ClassLevelLT(O:Object*, I:Category* CLASSCAT, I:Value*)
+	public bool OriginalClass(string obj, int @class)
+	{
+		return false;
+	}
+
+	public bool CutSceneBroken()
+	{
+		return false;
+	}
+
+	public bool WeaponEffectiveVs(string obj, int hand)
+	{
+		return false;
+	}
+
+	public bool INI(string name, int number)
+	{
+		return false;
+	}
+	public bool ModalStateObject(string obj, int modalState)
+	{
+		var creature = objectLocator.GetObject(obj);
+
+		if (creature == null)
+			return false;
+
+		var gamCreature = Game.PartyMembers.SingleOrDefault(s => s.CreFile.DeathVariable.ToString().Trim('\0') == creature.DeathVariable.ToString().Trim('\0'));
+		if (gamCreature == null)
+		{
+			gamCreature = Game.NonPartyMembers.SingleOrDefault(s => s.CreFile.DeathVariable.ToString().Trim('\0') == creature.DeathVariable.ToString().Trim('\0'));
+		}
+
+		return gamCreature != null && gamCreature.ModalAction == modalState;
+	}
+
+	public bool WeaponCanDamage(string obj, int hand)
+	{
+		return false;
+	}
+
+	public bool NumKilledByParty(int number)
+	{
+		return false;
+	}
+
+	public bool NumKilledByPartyGT(int number)
+	{
+		return false;
+	}
+
+	public bool NumKilledByPartyLT(int number)
+	{
+		return false;
+	}
+
+	public bool CanTurn(string obj, int difference)
+	{
+		return false;
+	}
+
+	public bool BitCheck(string name, string area, int bits)
+	{
+		return false;
+	}
+
+	public bool CanEquipRanged()
+	{
+		return false;
+	}
+
+	public bool ImmuneToSpellLevel(string obj, int level)
+	{
+		return false;
+	}
+
+	public bool StoryModeOn()
+	{
+		return false;
+	}
+
+	public bool IsForcedRandomEncounterActive(string area)
+	{
+		return false;
+	}
+
+	public bool ClassLevel(string obj, int category, int value)
+	{
+		return false;
+	}
+	public bool ClassLevelGT(string obj, int category, int value)
+	{
+		return false;
+	}
+	public bool ClassLevelLT(string obj, int category, int value)
+	{
+		return false;
+	}
 
 	public bool SecretDoorDetected(string obj, int open)
 	{
@@ -1438,6 +1520,98 @@ public class TriggerProcessor
 
 	public bool CheckItemSlot(string obj, string item, int slot)
 	{
+		var creature = objectLocator.GetObject(obj);
+
+		if (creature == null)
+			return false;
+
+		switch (slot)
+		{
+			case 0:
+				return creature.Items.Amulet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 1:
+				return creature.Items.Armor?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 2:
+				return creature.Items.Belt?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 3:
+				return creature.Items.Boots?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 4:
+				return creature.Items.Cloak?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 5:
+				return creature.Items.Gloves?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 6:
+				return creature.Items.Helmet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 7:
+				return creature.Items.RingLeft?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 8:
+				return creature.Items.RingRight?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 9:
+				return creature.Items.Shield?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 10:
+				return creature.Items.Amulet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper(); // TODO: 'fist'
+			case 11:
+				return creature.Items.Quiver1?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 12:
+				return creature.Items.Quiver2?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 13:
+				return creature.Items.Quiver3?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 14:
+				return creature.Items.Quiver4?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+
+
+			//TODO: There are 19 "misc" slots - figure out the order (some are quick item slots, some are inventory slots)
+			case 15:
+				return creature.Items.InventoryItem1?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 16:
+				return creature.Items.InventoryItem2?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 17:
+				return creature.Items.InventoryItem3?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 18:
+				return creature.Items.InventoryItem4?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 19:
+				return creature.Items.InventoryItem5?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 20:
+				return creature.Items.InventoryItem6?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 21:
+				return creature.Items.InventoryItem7?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 22:
+				return creature.Items.InventoryItem8?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 23:
+				return creature.Items.InventoryItem9?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 24:
+				return creature.Items.InventoryItem10?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 25:
+				return creature.Items.InventoryItem11?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 26:
+				return creature.Items.InventoryItem12?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 27:
+				return creature.Items.InventoryItem13?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 28:
+				return creature.Items.InventoryItem14?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 29:
+				return creature.Items.InventoryItem15?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 30:
+				return creature.Items.InventoryItem16?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 31:
+				return creature.Items.Amulet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 32:
+				return creature.Items.Amulet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 33:
+				return creature.Items.Amulet?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+
+
+			case 34:
+				return creature.Items.MagicWeapon?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 35:
+				return creature.Items.Weapon1?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 36:
+				return creature.Items.Weapon2?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 37:
+				return creature.Items.Weapon3?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+			case 38:
+				return creature.Items.Weapon4?.Filename.ToString().Trim('\0').ToUpper() == item.ToUpper();
+		}
+
 		return false;
 	}
 
