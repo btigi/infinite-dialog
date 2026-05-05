@@ -86,10 +86,10 @@ foreach (var state in d.states)
 
 		var triggers = SplitTriggers(trigger);
 
-		//triggers = new string[1];
-		//triggers[0] = "CalanderDay(1)";
+        //triggers = new string[1];
+        //triggers[0] = "NumKilledByParty(1)";
 
-		valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
+        valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
 	}
 
 	if (valid)

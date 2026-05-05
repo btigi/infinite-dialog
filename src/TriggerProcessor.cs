@@ -105,15 +105,15 @@ public class TriggerProcessor
 
     public bool Global(string name, string area, int value)
     {
-        if (area == "global")
+        if (area.Equals("GLOBAL", StringComparison.CurrentCultureIgnoreCase))
         {
             return this.GlobalState.SingleOrDefault(w => w.name == name).value == value;
         }
-        if (area == "area")
+        if (area.Equals("AREA", StringComparison.CurrentCultureIgnoreCase))
         {
             return this.Area.Variables.Count(w => w.variable == name && w.value == value) == 1;
         }
-        if (area == "locals")
+        if (area.Equals("LOCALS", StringComparison.CurrentCultureIgnoreCase))
         {
             //
         }
@@ -311,33 +311,33 @@ public class TriggerProcessor
             // cleric
             '1' => level switch
             {
-                '1' => this.Creature.MemorisedSpells.PriestLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '2' => this.Creature.MemorisedSpells.PriestLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '3' => this.Creature.MemorisedSpells.PriestLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '4' => this.Creature.MemorisedSpells.PriestLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '5' => this.Creature.MemorisedSpells.PriestLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '6' => this.Creature.MemorisedSpells.PriestLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '7' => this.Creature.MemorisedSpells.PriestLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '1' => this.Creature.MemorisedSpells.PriestLevel1.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '2' => this.Creature.MemorisedSpells.PriestLevel2.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '3' => this.Creature.MemorisedSpells.PriestLevel3.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '4' => this.Creature.MemorisedSpells.PriestLevel4.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '5' => this.Creature.MemorisedSpells.PriestLevel5.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '6' => this.Creature.MemorisedSpells.PriestLevel6.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '7' => this.Creature.MemorisedSpells.PriestLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
                 _ => false,
             },
             // mage
             '2' => level switch
             {
-                '1' => this.Creature.MemorisedSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '2' => this.Creature.MemorisedSpells.MageLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '3' => this.Creature.MemorisedSpells.MageLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '4' => this.Creature.MemorisedSpells.MageLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '5' => this.Creature.MemorisedSpells.MageLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '6' => this.Creature.MemorisedSpells.MageLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '7' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '8' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
-                '9' => this.Creature.MemorisedSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '1' => this.Creature.MemorisedSpells.MageLevel1.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '2' => this.Creature.MemorisedSpells.MageLevel2.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '3' => this.Creature.MemorisedSpells.MageLevel3.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '4' => this.Creature.MemorisedSpells.MageLevel4.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '5' => this.Creature.MemorisedSpells.MageLevel5.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '6' => this.Creature.MemorisedSpells.MageLevel6.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '7' => this.Creature.MemorisedSpells.MageLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '8' => this.Creature.MemorisedSpells.MageLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '9' => this.Creature.MemorisedSpells.MageLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
                 _ => false,
             },
             // innate
             '3' => level switch
             {
-                '1' => this.Creature.MemorisedSpells.Innate.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '1' => this.Creature.MemorisedSpells.Innate.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
                 _ => false,
             },
             _ => false,
@@ -354,7 +354,7 @@ public class TriggerProcessor
           this.Creature.MemorisedSpells.PriestLevel5.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
           this.Creature.MemorisedSpells.PriestLevel6.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
           this.Creature.MemorisedSpells.PriestLevel7.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
-          this.Creature.MemorisedSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.MemorisedSpells.MageLevel1.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
           this.Creature.MemorisedSpells.MageLevel2.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
           this.Creature.MemorisedSpells.MageLevel3.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
           this.Creature.MemorisedSpells.MageLevel4.Where(w => w.IsMemorised).Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
@@ -1902,17 +1902,17 @@ public class TriggerProcessor
 
     public bool NumKilledByParty(int number)
     {
-        return false;
+        return this.GlobalState.Where(w => w.name.StartsWith("SPRITE_IS_DEAD")).Sum(c => c.value) == number;
     }
 
     public bool NumKilledByPartyGT(int number)
     {
-        return false;
+        return this.GlobalState.Where(w => w.name.StartsWith("SPRITE_IS_DEAD")).Sum(c => c.value) > number;
     }
 
     public bool NumKilledByPartyLT(int number)
     {
-        return false;
+        return this.GlobalState.Where(w => w.name.StartsWith("SPRITE_IS_DEAD")).Sum(c => c.value) < number;
     }
 
     public bool CanTurn(string obj, int difference)
@@ -1947,6 +1947,12 @@ public class TriggerProcessor
 
     public bool ClassLevel(string obj, int category, int value)
     {
+        //TODO: XXX
+        //var creature = objectLocator.GetObject(obj);
+
+        //if (creature == null)
+        //    return false;
+
         return false;
     }
     public bool ClassLevelGT(string obj, int category, int value)
@@ -1965,12 +1971,69 @@ public class TriggerProcessor
 
     public bool HaveKnownSpell(int spell)
     {
-        return false;
+        var spellString = Convert.ToString(spell);
+        var type = spellString.First();
+        var level = spellString.Skip(1).Take(1).First();
+        var spellId = spellString.Substring(spellString.Length - 3, 3);
+
+        return type switch
+        {
+            // cleric
+            '1' => level switch
+            {
+                '1' => this.Creature.KnownSpells.PriestLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '2' => this.Creature.KnownSpells.PriestLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '3' => this.Creature.KnownSpells.PriestLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '4' => this.Creature.KnownSpells.PriestLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '5' => this.Creature.KnownSpells.PriestLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '6' => this.Creature.KnownSpells.PriestLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '7' => this.Creature.KnownSpells.PriestLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                _ => false,
+            },
+            // mage
+            '2' => level switch
+            {
+                '1' => this.Creature.KnownSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '2' => this.Creature.KnownSpells.MageLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '3' => this.Creature.KnownSpells.MageLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '4' => this.Creature.KnownSpells.MageLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '5' => this.Creature.KnownSpells.MageLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '6' => this.Creature.KnownSpells.MageLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '7' => this.Creature.KnownSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '8' => this.Creature.KnownSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                '9' => this.Creature.KnownSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                _ => false,
+            },
+            // innate
+            '3' => level switch
+            {
+                '1' => this.Creature.KnownSpells.Innate.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spellId),
+                _ => false,
+            },
+            _ => false,
+        };
     }
 
     public bool HaveKnownSpellRES(string spell)
     {
-        return false;
+        return
+          this.Creature.KnownSpells.PriestLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.PriestLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel1.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel2.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel3.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel4.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel5.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel6.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel7.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel8.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.MageLevel9.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper()) ||
+          this.Creature.KnownSpells.Innate.Select(s => s.Filename).ToString().ToUpper().Trim('\0').Contains(spell.ToUpper());
     }
 
     public bool CheckItemSlot(string obj, string item, int slot)
@@ -2072,6 +2135,24 @@ public class TriggerProcessor
 
     public bool CurrentAmmo(string resref, string obj)
     {
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        var slot = 35 + this.Creature.Items.SelectedWeapon;
+        switch (slot)
+        {
+            case 11:
+                return this.Creature.Items.Quiver1?.Charges1 > 0 && this.Creature.Items.Quiver1?.Filename.ToString().ToUpper().Trim('\0') == resref.ToUpper();
+            case 12:
+                return this.Creature.Items.Quiver2?.Charges1 > 0 && this.Creature.Items.Quiver2?.Filename.ToString().ToUpper().Trim('\0') == resref.ToUpper();
+            case 13:
+                return this.Creature.Items.Quiver3?.Charges1 > 0 && this.Creature.Items.Quiver3?.Filename.ToString().ToUpper().Trim('\0') == resref.ToUpper();
+            case 14:
+                return this.Creature.Items.Quiver4?.Charges1 > 0 && this.Creature.Items.Quiver4?.Filename.ToString().ToUpper().Trim('\0') == resref.ToUpper();
+        }
+
         return false;
     }
 
