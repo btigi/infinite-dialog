@@ -1140,25 +1140,169 @@ public class TriggerProcessor
         return false;
     }
 
+    private int GetItemCount(CreFile creature, string resRef)
+    {
+        var count = 0;
+        if (creature?.Items.Amulet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Armor?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Belt?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Boots?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Cloak?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Gloves?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Helmet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Helmet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem5?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem6?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem7?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem8?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem9?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem10?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem11?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem12?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem13?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem14?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem15?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.InventoryItem16?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.MagicWeapon?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.QuickItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.QuickItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.QuickItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Quiver1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Quiver2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Quiver3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Quiver4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.RingLeft?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.RingRight?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Weapon1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Weapon2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Weapon3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        if (creature?.Items.Weapon4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper())
+            count++;
+
+        return count;
+    }
+
     public bool NumItems(string resRef, string obj, int num)
     {
-        //var creature = objectLocator.GetObject(obj);
-        //return creature?.Items.Count(w => w == resRef) == num;
-        return true;
+        if (string.IsNullOrEmpty(resRef))
+            return false;
+
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        var count = GetItemCount(creature, resRef);
+
+        return count == num;
     }
 
     public bool NumItemsGT(string resRef, string obj, int num)
     {
-        //var creature = objectLocator.GetObject(obj);
-        //return creature?.Items.Count(w => w == resRef) > num;
-        return true;
+        if (string.IsNullOrEmpty(resRef))
+            return false;
+
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        var count = GetItemCount(creature, resRef);
+
+        return count > num;
     }
 
     public bool NumItemsLT(string resRef, string obj, int num)
     {
-        //var creature = objectLocator.GetObject(obj);
-        //return creature?.Items.Count(w => w == resRef) < num;
-        return true;
+        if (string.IsNullOrEmpty(resRef))
+            return false;
+
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        var count = GetItemCount(creature, resRef);
+
+        return count < num;
     }
 
     public bool NumItemsParty(string resRef, int num)
@@ -1847,7 +1991,9 @@ public class TriggerProcessor
 
     public bool ButtonDisabled(int button)
     {
-        return false;
+        return
+            this.Creature.Effects1.Where(w => w.Opcode == 144 && w.Parameter2 == button).Any() ||
+            this.Creature.Effects2.Where(w => w.Opcode == 144 && w.Parameter2 == button).Any();
     }
 
     public bool HasItemCategory(string obj, int itemtype, bool equipped)
@@ -1922,6 +2068,7 @@ public class TriggerProcessor
 
     public bool BitCheck(string name, string area, int bits)
     {
+        // Apparently the engine has a bug for this trigger and always returns false in dialog checks
         return false;
     }
 
