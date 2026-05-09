@@ -1,22 +1,27 @@
-﻿using ii.InfinityEngine;
+﻿using System.Diagnostics;
+using ii.InfinityEngine;
 using ii.InfinityEngine.Files;
 using ii.InfinityEngine.Readers;
 
-var gameDirectory = @"D:\Games\ie\bg2ee";
-var tlkDirectory = @"D:\Games\ie\bg2ee\lang\en_US";
+//var gameDirectory = @"D:\Games\ie\bg2ee";
+//var tlkDirectory = @"D:\Games\ie\bg2ee\lang\en_US";
+var gameDirectory = @"C:\speed\bg2ee";
+var tlkDirectory = @"C:\speed\bg2ee\lang\en_US";
 var gamFile = @"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam";
-var dFile = "ABAZIGAL.DLG";
+var dFile = "MOOK.DLG";
 
 if (args.Length == 4)
 {
-	gameDirectory = args[0];
-	tlkDirectory = args[1];
-	gamFile = args[2];
-	dFile = args[3];
+    gameDirectory = args[0];
+    tlkDirectory = args[1];
+    gamFile = args[2];
+    dFile = args[3];
 }
 
+var sw = new Stopwatch();
+
 var game = new Game(gameDirectory, tlkDirectory);
-game.LoadResources([IEFileType.Dlg, IEFileType.Ids, IEFileType.DimensionalArray, IEFileType.Cre, IEFileType.Itm, IEFileType.Sto]);
+game.LoadAllResources();
 
 var gamReader = new GamFileBinaryReader();
 gamReader.TlkFile = game.Tlk;
@@ -52,7 +57,7 @@ var foundEntryState = false;
 
 if (d.states.Any(a => a.Weight > 0))
 {
-	d.states = d.states.OrderBy(o => o.Weight).ToList();
+    d.states = d.states.OrderBy(o => o.Weight).ToList();
 }
 
 var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores, game.Items, gam, game.Tlk);
@@ -65,125 +70,125 @@ var x = Path.ChangeExtension(d.Filename.ToString().Trim('\0').ToUpper(), "").Tri
 var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
 if (c != null)
 {
-	var existingColour = Console.ForegroundColor;
-	Console.ForegroundColor = ConsoleColor.Blue;
-	Console.WriteLine($"{c.ShortName.Text}");
-	Console.ForegroundColor = existingColour;
+    var existingColour = Console.ForegroundColor;
+    Console.ForegroundColor = ConsoleColor.Blue;
+    Console.WriteLine($"{c.ShortName.Text}");
+    Console.ForegroundColor = existingColour;
 }
 
 var currentStateNumber = 0;
 foreach (var state in d.states)
 {
-	var valid = false;
-	if (String.IsNullOrEmpty(state.Trigger))
-	{
-		continue;
-	}
-	else
-	{
-		Console.WriteLine($"State {state.StateNumber} (weight {state.Weight})");
-		var trigger = state.Trigger;
+    var valid = false;
+    if (String.IsNullOrEmpty(state.Trigger))
+    {
+        continue;
+    }
+    else
+    {
+        Console.WriteLine($"State {state.StateNumber} (weight {state.Weight})");
+        var trigger = state.Trigger;
 
-		var triggers = SplitTriggers(trigger);
+        var triggers = SplitTriggers(trigger);
 
         //triggers = new string[1];
-        //triggers[0] = "NumKilledByParty(1)";
+        //triggers[0] = "ClassLevel(\"MINSC\", 1, 1)";
 
         valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
-	}
+    }
 
-	if (valid)
-	{
-		tp.selectedRandom = -1;
-		currentStateNumber = state.StateNumber;
-		foundEntryState = true;
-		break;
-	}
+    if (valid)
+    {
+        tp.selectedRandom = -1;
+        currentStateNumber = state.StateNumber;
+        foundEntryState = true;
+        break;
+    }
 }
 
 if (!foundEntryState)
 {
-	Console.WriteLine("Target has no valid dialog");
+    Console.WriteLine("Target has no valid dialog");
 }
 else
 {
-	var ap = new ActionProcessor(objectLocator, idsProcessor);
-	ap.Area = area;
-	ap.Creature = myself;
+    var ap = new ActionProcessor(objectLocator, idsProcessor);
+    ap.Area = area;
+    ap.Creature = myself;
 
-	DlgFile currentDlg = d;
-	var dialogDone = false;
+    DlgFile currentDlg = d;
+    var dialogDone = false;
 
-	void ProcessTransition(Transition2 t)
-	{
-		if (t.HasAction && !string.IsNullOrEmpty(t.Action))
-		{
-			EvaluateTriggers<ActionProcessor>(SplitTriggers(t.Action), ap, game.Identifiers);
-		}
+    void ProcessTransition(Transition2 t)
+    {
+        if (t.HasAction && !string.IsNullOrEmpty(t.Action))
+        {
+            EvaluateTriggers<ActionProcessor>(SplitTriggers(t.Action), ap, game.Identifiers);
+        }
 
-		if (t.TerminateDialog)
-		{
-			dialogDone = true;
-			return;
-		}
+        if (t.TerminateDialog)
+        {
+            dialogDone = true;
+            return;
+        }
 
-		var x = t.Dialog.ToString().Trim('\0').ToUpper();
-		var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
-		if (c != null)
-		{
-			var existingColour = Console.ForegroundColor;
-			Console.ForegroundColor = ConsoleColor.Blue;
-			Console.WriteLine($"{c.ShortName.Text}");
-			Console.ForegroundColor = existingColour;
-		}
+        var x = t.Dialog.ToString().Trim('\0').ToUpper();
+        var c = game.Creatures.Where(w => w.DialogFile.ToString().Trim('\0').ToUpper() == x).FirstOrDefault();
+        if (c != null)
+        {
+            var existingColour = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"{c.ShortName.Text}");
+            Console.ForegroundColor = existingColour;
+        }
 
-		var nextDlg = LookupDlg(game.Dialogs, t.Dialog) ?? currentDlg;
-		currentDlg = nextDlg;
-		currentStateNumber = t.NextState;
-	}
+        var nextDlg = LookupDlg(game.Dialogs, t.Dialog) ?? currentDlg;
+        currentDlg = nextDlg;
+        currentStateNumber = t.NextState;
+    }
 
-	while (!dialogDone)
-	{
-		var state = LookupState(currentDlg, currentStateNumber);
-		if (state == null)
-		{
-			Console.WriteLine("[State not found]");
-			break;
-		}
+    while (!dialogDone)
+    {
+        var state = LookupState(currentDlg, currentStateNumber);
+        if (state == null)
+        {
+            Console.WriteLine("[State not found]");
+            break;
+        }
 
-		Console.WriteLine($"{state.ResponseText.Text} ({state.ResponseText.Strref})");
+        Console.WriteLine($"{state.ResponseText.Text} ({state.ResponseText.Strref})");
 
-		var validTransitions = state.transitions
-			.Where(t => !t.HasTrigger ||
-						 EvaluateTriggers<TriggerProcessor>(SplitTriggers(t.Trigger), tp, game.Identifiers))
-			.ToList();
+        var validTransitions = state.transitions
+            .Where(t => !t.HasTrigger ||
+                         EvaluateTriggers<TriggerProcessor>(SplitTriggers(t.Trigger), tp, game.Identifiers))
+            .ToList();
 
-		if (!validTransitions.Any())
-		{
-			Console.WriteLine("[No valid responses]");
-			break;
-		}
+        if (!validTransitions.Any())
+        {
+            Console.WriteLine("[No valid responses]");
+            break;
+        }
 
-		if (validTransitions.Count == 1 && !validTransitions[0].HasText)
-		{
-			ProcessTransition(validTransitions[0]);
-			continue;
-		}
+        if (validTransitions.Count == 1 && !validTransitions[0].HasText)
+        {
+            ProcessTransition(validTransitions[0]);
+            continue;
+        }
 
-		for (int i = 0; i < validTransitions.Count; i++)
-		{
-			if (validTransitions[i].HasText)
-			{
-				Console.WriteLine($" - [{i}] {validTransitions[i].TransitionText.Text}");
-			}
-		}
+        for (int i = 0; i < validTransitions.Count; i++)
+        {
+            if (validTransitions[i].HasText)
+            {
+                Console.WriteLine($" - [{i}] {validTransitions[i].TransitionText.Text}");
+            }
+        }
 
-		Console.Write("> ");
-		var selected = Convert.ToInt32(Console.ReadLine());
-		ProcessTransition(validTransitions[selected]);
-	}
+        Console.Write("> ");
+        var selected = Convert.ToInt32(Console.ReadLine());
+        ProcessTransition(validTransitions[selected]);
+    }
 
-	Console.WriteLine();
+    Console.WriteLine();
 }
 
 ////var triggerText = "Global(\"Lumbar_Huff\", \"GLOBAL\", 1)Global(\"Know_L\r\numbar\", \"GLOBAL\", 0)";
@@ -239,124 +244,124 @@ else
 
 static string[] SplitTriggers(string text)
 {
-	if (string.IsNullOrEmpty(text))
-		return [];
-	return text.Split([")"], StringSplitOptions.None)
-		.Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
-		.ToArray();
+    if (string.IsNullOrEmpty(text))
+        return [];
+    return text.Split([")"], StringSplitOptions.None)
+        .Select(m => (m.EndsWith(')') ? m : m + ")").Trim())
+        .ToArray();
 }
 
 static State2 LookupState(DlgFile dlg, int stateNumber) => dlg.states.SingleOrDefault(s => s.StateNumber == stateNumber);
 
 static DlgFile LookupDlg(IEnumerable<DlgFile> dialogs, array8 resref)
 {
-	var name = resref.ToString().ToUpperInvariant();
-	if (string.IsNullOrEmpty(name))
-		return null;
-	return dialogs.SingleOrDefault(d => Path.GetFileNameWithoutExtension(d.Filename).ToUpperInvariant() == name);
+    var name = resref.ToString().ToUpperInvariant();
+    if (string.IsNullOrEmpty(name))
+        return null;
+    return dialogs.SingleOrDefault(d => Path.GetFileNameWithoutExtension(d.Filename).ToUpperInvariant() == name);
 }
 
 static bool EvaluateTriggers<T>(string[] methods, object o, List<IdsFile> idsFiles)
 {
-	bool? result = true;
-	foreach (var methodCall in methods)
-	{
-		if (methodCall == ")")
-			continue;
+    bool? result = true;
+    foreach (var methodCall in methods)
+    {
+        if (methodCall == ")")
+            continue;
 
-		var methodName = methodCall[..methodCall.IndexOf('(')];
+        var methodName = methodCall[..methodCall.IndexOf('(')];
 
-		var inverted = false;
-		if (methodName.StartsWith("!"))
-		{
-			methodName = methodName[1..];
-			inverted = true;
-		}
+        var inverted = false;
+        if (methodName.StartsWith("!"))
+        {
+            methodName = methodName[1..];
+            inverted = true;
+        }
 
-		var parametersString = methodCall.Substring(methodCall.IndexOf('(') + 1, methodCall.IndexOf(')') - methodCall.IndexOf('(') - 1);
+        var parametersString = methodCall.Substring(methodCall.IndexOf('(') + 1, methodCall.IndexOf(')') - methodCall.IndexOf('(') - 1);
 
-		var parameters = parametersString.Split(',').Select(p => p.Trim()).ToArray();
-
-
+        var parameters = parametersString.Split(',').Select(p => p.Trim()).ToArray();
 
 
-		//TODO: Find the trigger in trigger.ids
-		//      Split the parameters
-		//      Check the parameter types
-		//      If a parameter type is I:<something> load the <something>ids file and replace our param value with the int associated with the value in the IDS
 
-		var triggerDefinition = idsFiles.Single(s => s.Filename.ToUpper() == "TRIGGER.IDS");
-		var triggers = triggerDefinition.contents.Split("\r\n");
-		// Note: This .First() means we don't support overloads
-		try
-		{
-			var thisTrigger = triggers.Where(w => w.Contains($" {methodName}(")).First(); // e.g. "0x400F Global(S:Name*,S:Area*,I:Value*)"
-			var triggerParameters = thisTrigger.Substring(thisTrigger.IndexOf("(")).Trim(['(', ')']).Split(',');
 
-			var i = 0;
-			foreach (var p in triggerParameters)
-			{
-				if (p.Contains('*') && !p.EndsWith('*'))
-				{
-					var ids = p.Substring(p.LastIndexOf('*'));
-					var relevantIds = idsFiles.Where(w => w.Filename.ToUpper().Replace(".IDS", "") == ids.ToUpper().Replace("*", "")).First();
-					var lines = relevantIds.contents.Split("\r\n");
+        //TODO: Find the trigger in trigger.ids
+        //      Split the parameters
+        //      Check the parameter types
+        //      If a parameter type is I:<something> load the <something>ids file and replace our param value with the int associated with the value in the IDS
 
-					var actualTrigger = parameters[i].Replace("\"", "");
+        var triggerDefinition = idsFiles.Single(s => s.Filename.ToUpper() == "TRIGGER.IDS");
+        var triggers = triggerDefinition.contents.Split("\r\n");
+        // Note: This .First() means we don't support overloads
+        try
+        {
+            var thisTrigger = triggers.Where(w => w.Contains($" {methodName}(")).First(); // e.g. "0x400F Global(S:Name*,S:Area*,I:Value*)"
+            var triggerParameters = thisTrigger.Substring(thisTrigger.IndexOf("(")).Trim(['(', ')']).Split(',');
 
-					var line = lines.Where(w => w.EndsWith(actualTrigger)).First();
-					var value = line.Split(" ")[0];
-					parameters[i] = value;
-					if (value.StartsWith("0x"))
-					{
-						parameters[i] = Convert.ToString(Convert.ToInt32(value, 16));
-					}
-				}
-				i++;
-			}
-		}
-		catch
-		{
-			//TODO:
-		}
+            var i = 0;
+            foreach (var p in triggerParameters)
+            {
+                if (p.Contains('*') && !p.EndsWith('*'))
+                {
+                    var ids = p.Substring(p.LastIndexOf('*'));
+                    var relevantIds = idsFiles.Where(w => w.Filename.ToUpper().Replace(".IDS", "") == ids.ToUpper().Replace("*", "")).First();
+                    var lines = relevantIds.contents.Split("\r\n");
 
-		var method = typeof(T).GetMethod(methodName);
+                    var actualTrigger = parameters[i].Replace("\"", "");
 
-		if (method != null)
-		{
-			var methodParameters = method.GetParameters()
-										 .Select((p, index) => ConvertParameter(parameters[index], p.ParameterType))
-										 .Select(m => (m as string) != null ? (m as string).Trim('\"') : m)
-										 .ToArray();
+                    var line = lines.Where(w => w.EndsWith(actualTrigger)).First();
+                    var value = line.Split(" ")[0];
+                    parameters[i] = value;
+                    if (value.StartsWith("0x"))
+                    {
+                        parameters[i] = Convert.ToString(Convert.ToInt32(value, 16));
+                    }
+                }
+                i++;
+            }
+        }
+        catch
+        {
+            //TODO:
+        }
 
-			result = method.Invoke(o, methodParameters) as bool?;
-			if (inverted)
-			{
-				result = !result;
-			}
+        var method = typeof(T).GetMethod(methodName);
 
-			//Console.WriteLine($"  {(inverted ? "!" : string.Empty)}{methodName} {String.Join(",", parametersString.Split(',').Select(p => p.Trim()).ToArray())} -> {result}");
+        if (method != null)
+        {
+            var methodParameters = method.GetParameters()
+                                         .Select((p, index) => ConvertParameter(parameters[index], p.ParameterType))
+                                         .Select(m => (m as string) != null ? (m as string).Trim('\"') : m)
+                                         .ToArray();
 
-			if (result != true)
-			{
-				//Console.WriteLine("    Method result: " + false);
-				break;
-			}
-			//Console.WriteLine("    Method result: " + result);
-		}
-		else
-		{
-			Console.WriteLine("    Method not found: " + methodName);
-		}
-	}
-	return result ?? false;
+            result = method.Invoke(o, methodParameters) as bool?;
+            if (inverted)
+            {
+                result = !result;
+            }
+
+            //Console.WriteLine($"  {(inverted ? "!" : string.Empty)}{methodName} {String.Join(",", parametersString.Split(',').Select(p => p.Trim()).ToArray())} -> {result}");
+
+            if (result != true)
+            {
+                //Console.WriteLine("    Method result: " + false);
+                break;
+            }
+            //Console.WriteLine("    Method result: " + result);
+        }
+        else
+        {
+            Console.WriteLine("    Method not found: " + methodName);
+        }
+    }
+    return result ?? false;
 }
 
 static object ConvertParameter(string parameter, Type targetType)
 {
-	if (targetType == typeof(string))
-	{
-		return parameter;
-	}
-	return Convert.ChangeType(parameter, targetType);
+    if (targetType == typeof(string))
+    {
+        return parameter;
+    }
+    return Convert.ChangeType(parameter, targetType);
 }

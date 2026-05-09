@@ -1452,7 +1452,7 @@ public class TriggerProcessor
 
     public bool IfValidForPartyDialog(string obj)
     {
-        var creature = this.objectLocator.Party.Where(w => w.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj).SingleOrDefault();		
+        var creature = this.objectLocator.Party.Where(w => w.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == obj).SingleOrDefault();
         return creature?.Selection != 0x8000;
     }
 
@@ -1551,7 +1551,7 @@ public class TriggerProcessor
                (creature?.Effects2.Any(a => a.Opcode == 207) ?? false) ||
                (creature?.Effects2.Any(a => a.Opcode == 227) ?? false) ||
                (creature?.Effects2.Any(a => a.Opcode == 228) ?? false);
-    }                                                       
+    }
 
     public bool HasImmunityEffects(string obj)
     {
@@ -1947,21 +1947,135 @@ public class TriggerProcessor
 
     public bool ClassLevel(string obj, int category, int value)
     {
-        //TODO: XXX
-        //var creature = objectLocator.GetObject(obj);
+        var creature = objectLocator.GetObject(obj);
 
-        //if (creature == null)
-        //    return false;
+        if (creature == null)
+            return false;
 
-        return false;
+        return category switch
+        {
+            // mage
+            1 => (creature.Class == 1 && creature.Level1 == value) ||  // mage
+                 (creature.Class == 7 && creature.Level2 == value) ||  // fighter_mage
+                 (creature.Class == 10 && creature.Level2 == value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level1 == value) || // mage_thief
+                 (creature.Class == 14 && creature.Level2 == value) || // cleric_mage
+                 (creature.Class == 17 && creature.Level2 == value),   // fighter_mage_cleric
+
+            // warrior
+            2 => (creature.Class == 2 && creature.Level1 == value) ||  // fighter
+                 (creature.Class == 7 && creature.Level1 == value) ||  // fighter_mage
+                 (creature.Class == 8 && creature.Level1 == value) ||  // fighter_cleric
+                 (creature.Class == 9 && creature.Level1 == value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level1 == value) || // fighter_mage_thief
+                 (creature.Class == 16 && creature.Level1 == value) || // fighter_druid
+                 (creature.Class == 17 && creature.Level1 == value) || // fighter_mage_cleric
+                 (creature.Class == 20 && creature.Level1 == value),   // monk
+
+            // priest
+            3 => (creature.Class == 3 && creature.Level1 == value) ||  // cleric
+                 (creature.Class == 8 && creature.Level2 == value) ||  // fighter_cleric
+                 (creature.Class == 14 && creature.Level1 == value) || // cleric_mage
+                 (creature.Class == 15 && creature.Level1 == value) || // cleric_thief
+                 (creature.Class == 17 && creature.Level3 == value) || // fighter_mage_cleric
+                 (creature.Class == 18 && creature.Level1 == value),   // cleric_ranger
+
+            // rogue
+            4 => (creature.Class == 4 && creature.Level1 == value) ||  // thief
+                 (creature.Class == 9 && creature.Level2 == value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level3 == value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level2 == value) || // mage_thief
+                 (creature.Class == 15 && creature.Level3 == value),   // cleric_thief
+            _ => false,
+        };
     }
     public bool ClassLevelGT(string obj, int category, int value)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        return category switch
+        {
+            // mage
+            1 => (creature.Class == 1 && creature.Level1 > value) ||  // mage
+                 (creature.Class == 7 && creature.Level2 > value) ||  // fighter_mage
+                 (creature.Class == 10 && creature.Level2 > value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level1 > value) || // mage_thief
+                 (creature.Class == 14 && creature.Level2 > value) || // cleric_mage
+                 (creature.Class == 17 && creature.Level2 > value),   // fighter_mage_cleric
+
+            // warrior                                                                   
+            2 => (creature.Class == 2 && creature.Level1 > value) ||  // fighter
+                 (creature.Class == 7 && creature.Level1 > value) ||  // fighter_mage
+                 (creature.Class == 8 && creature.Level1 > value) ||  // fighter_cleric
+                 (creature.Class == 9 && creature.Level1 > value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level1 > value) || // fighter_mage_thief
+                 (creature.Class == 16 && creature.Level1 > value) || // fighter_druid
+                 (creature.Class == 17 && creature.Level1 > value) || // fighter_mage_cleric
+                 (creature.Class == 20 && creature.Level1 > value),   // monk
+
+            // priest
+            3 => (creature.Class == 3 && creature.Level1 > value) ||  // cleric
+                 (creature.Class == 8 && creature.Level2 > value) ||  // fighter_cleric
+                 (creature.Class == 14 && creature.Level1 > value) || // cleric_mage
+                 (creature.Class == 15 && creature.Level1 > value) || // cleric_thief
+                 (creature.Class == 17 && creature.Level3 > value) || // fighter_mage_cleric
+                 (creature.Class == 18 && creature.Level1 > value),   // cleric_ranger
+
+            // rogue
+            4 => (creature.Class == 4 && creature.Level1 > value) ||  // thief
+                 (creature.Class == 9 && creature.Level2 > value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level3 > value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level2 > value) || // mage_thief
+                 (creature.Class == 15 && creature.Level3 > value),   // cleric_thief
+            _ => false,
+        };
     }
     public bool ClassLevelLT(string obj, int category, int value)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        return category switch
+        {
+            // mage
+            1 => (creature.Class == 1 && creature.Level1 < value) ||  // mage
+                 (creature.Class == 7 && creature.Level2 < value) ||  // fighter_mage
+                 (creature.Class == 10 && creature.Level2 < value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level1 < value) || // mage_thief
+                 (creature.Class == 14 && creature.Level2 < value) || // cleric_mage
+                 (creature.Class == 17 && creature.Level2 < value),   // fighter_mage_cleric
+
+            // warrior                                                                   
+            2 => (creature.Class == 2 && creature.Level1 < value) ||  // fighter
+                 (creature.Class == 7 && creature.Level1 < value) ||  // fighter_mage
+                 (creature.Class == 8 && creature.Level1 < value) ||  // fighter_cleric
+                 (creature.Class == 9 && creature.Level1 < value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level1 < value) || // fighter_mage_thief
+                 (creature.Class == 16 && creature.Level1 < value) || // fighter_druid
+                 (creature.Class == 17 && creature.Level1 < value) || // fighter_mage_cleric
+                 (creature.Class == 20 && creature.Level1 < value),   // monk
+
+            // priest
+            3 => (creature.Class == 3 && creature.Level1 < value) ||  // cleric
+                 (creature.Class == 8 && creature.Level2 < value) ||  // fighter_cleric
+                 (creature.Class == 14 && creature.Level1 < value) || // cleric_mage
+                 (creature.Class == 15 && creature.Level1 < value) || // cleric_thief
+                 (creature.Class == 17 && creature.Level3 < value) || // fighter_mage_cleric
+                 (creature.Class == 18 && creature.Level1 < value),   // cleric_ranger
+
+            // rogue
+            4 => (creature.Class == 4 && creature.Level1 < value) ||  // thief
+                 (creature.Class == 9 && creature.Level2 < value) ||  // fighter_thief
+                 (creature.Class == 10 && creature.Level3 < value) || // fighter_mage_thief
+                 (creature.Class == 13 && creature.Level2 < value) || // mage_thief
+                 (creature.Class == 15 && creature.Level3 < value),   // cleric_thief
+            _ => false,
+        };
     }
 
     public bool SecretDoorDetected(string obj, int open)
