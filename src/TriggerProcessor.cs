@@ -435,6 +435,7 @@ public class TriggerProcessor
     public bool StateCheck(string obj, int state)
     {
         var creature = objectLocator.GetObject(obj);
+
         if (creature == null)
             return false;
 
@@ -1539,17 +1540,26 @@ public class TriggerProcessor
 
     public bool LocalsEqual(string name1, string name2)
     {
-        return false;
+        var local1 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+        var local2 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+
+        return local1 == local2;
     }
 
     public bool LocalsGT(string name1, string name2)
     {
-        return false;
+        var local1 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+        var local2 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+
+        return local1 > local2;
     }
 
     public bool LocalsLT(string name1, string name2)
     {
-        return false;
+        var local1 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+        var local2 = this.Creature.Effects2.Where(w => w.Opcode == 187 && w.Variable.ToString().ToUpper().Trim('\0') == name1.ToUpper()).Select(s => s.Parameter1).FirstOrDefault();
+
+        return local1 < local2;
     }
 
     public bool ObjectActionListEmpty(string obj)
@@ -1574,25 +1584,6 @@ public class TriggerProcessor
 
     public bool CalanderDay(int day)
     {
-        //var years2da = dimensionalArrayFiles.Where(w => w.Filename.ToUpper() == "YEARS.2DA").Single();
-        //var lines = years2da.Contents.Split("\r\n");
-        //var startTime = Convert.ToInt32(lines.Where(w => w.StartsWith("STARTTIME")).Single().Split(" ", StringSplitOptions.RemoveEmptyEntries).Last()) / 7200;
-        //var startYear = Convert.ToInt32(lines.Where(w => w.StartsWith("STARTYEAR")).Single().Split(" ", StringSplitOptions.RemoveEmptyEntries).Last());
-
-        //var months2da = dimensionalArrayFiles.Where(w => w.Filename.ToUpper() == "MONTHS.2DA").Single();
-        //lines = months2da.Contents.Split("\r\n").Skip(3).ToArray();
-
-
-        //var months = new List<(string, int)>();
-        //foreach (var line in lines)
-        //{
-        //	var parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        //	if (parts.Length > 0)
-        //	{
-        //		months.Add((tlk.Strings[Convert.ToInt32(parts[2])].Text, Convert.ToInt32(parts[1])));
-        //	}
-        //}
-
         var currentDays = game.GameTime / 7200;
         return day == currentDays;
     }
@@ -1722,6 +1713,9 @@ public class TriggerProcessor
     {
         var creature = objectLocator.GetObject(obj);
 
+        if (creature == null)
+            return false;
+
         return (creature?.Effects1.Any(a => a.Opcode == 197) ?? false) ||
                (creature?.Effects1.Any(a => a.Opcode == 198) ?? false) ||
                (creature?.Effects1.Any(a => a.Opcode == 199) ?? false) ||
@@ -1745,7 +1739,34 @@ public class TriggerProcessor
 
     public bool HasImmunityEffects(string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        return (creature?.Effects1.Any(a => a.Opcode == 83) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 101) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 169) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 267) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 296) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 102) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 201) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 204) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 205) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 223) ?? false) ||
+               (creature?.Effects1.Any(a => a.Opcode == 226) ?? false) ||
+
+               (creature?.Effects2.Any(a => a.Opcode == 83) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 101) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 169) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 267) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 296) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 102) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 201) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 204) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 205) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 223) ?? false) ||
+               (creature?.Effects2.Any(a => a.Opcode == 226) ?? false);
     }
 
     public bool HasItemSlot(string obj, int slot)
