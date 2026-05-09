@@ -1356,7 +1356,29 @@ public class TriggerProcessor
 
     public bool HasItemEquipped(string resRef, string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+        return
+            creature.Items.Helmet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Armor?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Shield?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Gloves?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.RingLeft?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.RingRight?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Amulet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Belt?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Boots?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Weapon1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Weapon2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Weapon3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Weapon4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Quiver1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Quiver2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Quiver3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Quiver4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.Cloak?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.QuickItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.QuickItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+            creature.Items.QuickItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper();
     }
 
     public bool NumCreatureVsParty(string obj, int num)
