@@ -1307,17 +1307,38 @@ public class TriggerProcessor
 
     public bool NumItemsParty(string resRef, int num)
     {
-        return false;
+        var count = 0;
+        var partyMembers = objectLocator.Party.Where(w => w.CreFile != null).Select(s => s.CreFile);
+        foreach (var partyMember in partyMembers)
+        {
+            count += GetItemCount(partyMember, resRef);
+        }
+
+        return num == count;
     }
 
     public bool NumItemsPartyGT(string resRef, int num)
     {
-        return false;
+        var count = 0;
+        var partyMembers = objectLocator.Party.Where(w => w.CreFile != null).Select(s => s.CreFile);
+        foreach (var partyMember in partyMembers)
+        {
+            count += GetItemCount(partyMember, resRef);
+        }
+
+        return num > count;
     }
 
     public bool NumItemsPartyLT(string resRef, int num)
     {
-        return false;
+        var count = 0;
+        var partyMembers = objectLocator.Party.Where(w => w.CreFile != null).Select(s => s.CreFile);
+        foreach (var partyMember in partyMembers)
+        {
+            count += GetItemCount(partyMember, resRef);
+        }
+
+        return num < count;
     }
 
     public bool IsOverMe(string obj)
