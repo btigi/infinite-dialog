@@ -1771,7 +1771,54 @@ public class TriggerProcessor
 
     public bool HasItemSlot(string obj, int slot)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        //TODO: Determine usage of Misc slots (all labelled as Inventory16 here)
+        return slot switch
+        {
+            0 => creature?.Items.Amulet?.Filename.ToString() != string.Empty,
+            1 => creature?.Items.Armor?.Filename.ToString() != string.Empty,
+            2 => creature?.Items.Belt?.Filename.ToString() != string.Empty,
+            3 => creature?.Items.Boots?.Filename.ToString() != string.Empty,
+            4 => creature?.Items.Cloak?.Filename.ToString() != string.Empty,
+            5 => creature?.Items.Gloves?.Filename.ToString() != string.Empty,
+            6 => creature?.Items.Helmet?.Filename.ToString() != string.Empty,
+            7 => creature?.Items.RingLeft?.Filename.ToString() != string.Empty,
+            8 => creature?.Items.RingRight?.Filename.ToString() != string.Empty,
+            9 => creature?.Items.Shield?.Filename.ToString() != string.Empty,
+            10 or 11 => creature?.Items.Quiver1?.Filename.ToString() != string.Empty,
+            12 => creature?.Items.Quiver2?.Filename.ToString() != string.Empty,
+            13 => creature?.Items.Quiver3?.Filename.ToString() != string.Empty,
+            14 => creature?.Items.Quiver4?.Filename.ToString() != string.Empty,
+            15 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            16 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            17 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            18 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            19 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            20 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            21 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            22 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            23 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            24 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            25 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            26 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            27 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            28 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            29 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            30 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            31 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            32 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            33 => creature?.Items.InventoryItem16?.Filename.ToString() != string.Empty,
+            34 => creature?.Items.MagicWeapon?.Filename.ToString() != string.Empty,
+            35 => creature?.Items.Weapon1?.Filename.ToString() != string.Empty,
+            36 => creature?.Items.Weapon2?.Filename.ToString() != string.Empty,
+            37 => creature?.Items.Weapon3?.Filename.ToString() != string.Empty,
+            38 => creature?.Items.Weapon4?.Filename.ToString() != string.Empty,
+            _ => false,
+        };
     }
 
     public bool PersonalSpaceDistance(string obj, int range)
@@ -1781,7 +1828,12 @@ public class TriggerProcessor
 
     public bool InMyGroup(string obj)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        return creature.Specific == this.Creature.Specific;
     }
 
     public bool RealGlobalTimerExact(string name, string area)
@@ -1816,6 +1868,11 @@ public class TriggerProcessor
 
     public bool Kit(string obj, int kit)
     {
+        //var creature = objectLocator.GetObject(obj);
+
+        //if (creature == null)
+        //    return false;
+
         return false;
     }
 
