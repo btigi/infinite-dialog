@@ -1112,17 +1112,20 @@ public class TriggerProcessor
 
     public bool NumDead(string name, int num)
     {
-        return false;
+        var count = this.GlobalState.Where(w => $"SPRITE_IS_DEAD{w.name.ToString().ToUpper().Trim('\0')}" == name.ToUpper()).FirstOrDefault().value;
+        return count == num;
     }
 
     public bool NumDeadGT(string name, int num)
     {
-        return false;
+        var count = this.GlobalState.Where(w => $"SPRITE_IS_DEAD{w.name.ToString().ToUpper().Trim('\0')}" == name.ToUpper()).FirstOrDefault().value;
+        return count > num;
     }
 
     public bool NumDeadLT(string name, int num)
     {
-        return false;
+        var count = this.GlobalState.Where(w => $"SPRITE_IS_DEAD{w.name.ToString().ToUpper().Trim('\0')}" == name.ToUpper()).FirstOrDefault().value;
+        return count < num;
     }
 
     public bool Detect(string obj)
