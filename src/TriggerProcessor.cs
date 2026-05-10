@@ -2110,7 +2110,38 @@ public class TriggerProcessor
 
     public bool IsWeaponRanged(string obj)
     {
-        return false;
+        ItmFile item = null;
+
+        var slot = 35 + this.Creature.Items.SelectedWeapon;
+        switch (slot)
+        {
+            case 11:
+                return true; // quiver1
+            case 12:
+                return true; // quiver2
+            case 13:
+                return true; // quiver3
+            case 14:
+                return true; // quiver4
+
+            case 34:
+                item = items.Where(w => w.Filename?.ToString().ToUpper().Trim('\0') == this.Creature.Items.MagicWeapon?.Filename.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+                return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
+            case 35:
+                item = items.Where(w => w.Filename?.ToString().ToUpper().Trim('\0') == this.Creature.Items.Weapon1?.Filename.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+                return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
+            case 36:
+                item = items.Where(w => w.Filename?.ToString().ToUpper().Trim('\0') == this.Creature.Items.Weapon2?.Filename.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+                return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
+            case 37:
+                item = items.Where(w => w.Filename?.ToString().ToUpper().Trim('\0') == this.Creature.Items.Weapon3?.Filename.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+                return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
+            case 38:
+                item = items.Where(w => w.Filename?.ToString().ToUpper().Trim('\0') == this.Creature.Items.Weapon4?.Filename.ToString().ToUpper().Trim('\0')).FirstOrDefault();
+                return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
+        }
+
+         return false;
     }
 
     public bool ButtonDisabled(int button)
@@ -2132,7 +2163,21 @@ public class TriggerProcessor
 
     public bool OriginalClass(string obj, int @class)
     {
-        return false;
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        return @class switch
+        {
+            1 => creature.Flags.OriginalMage,
+            2 => creature.Flags.OriginalFighter,
+            3 => creature.Flags.OriginalCleric,
+            4 => creature.Flags.OriginalThief,
+            11 => creature.Flags.OriginalDruid,
+            12 => creature.Flags.OriginalRanger,
+            _ => false,
+        };
     }
 
     public bool CutSceneBroken()
