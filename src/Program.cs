@@ -183,8 +183,28 @@ else
             }
         }
 
-        Console.Write("> ");
-        var selected = Convert.ToInt32(Console.ReadLine());
+        int selected;
+        while (true)
+        {
+            Console.Write("> ");
+            var line = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(line) || !int.TryParse(line.Trim(), out selected))
+            {
+                var max = validTransitions.Count - 1;
+                Console.WriteLine(max == 0 ? "Enter 0." : $"Enter a number from 0 to {max}.");
+                continue;
+            }
+
+            if (selected < 0 || selected >= validTransitions.Count)
+            {
+                var max = validTransitions.Count - 1;
+                Console.WriteLine(max == 0 ? "Enter 0." : $"Enter a number from 0 to {max}.");
+                continue;
+            }
+
+            break;
+        }
+
         ProcessTransition(validTransitions[selected]);
     }
 
