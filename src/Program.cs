@@ -9,16 +9,18 @@ var gameDirectory = @"C:\speed\bg2ee";
 var tlkDirectory = @"C:\speed\bg2ee\lang\en_US";
 var gamFile = @"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam";
 var dFile = "ARNWAR06.DLG";
+var luaPath = @"C:\Users\igi\Documents\Baldur's Gate II - Enhanced Edition\Baldur.lua";
 
-if (args.Length == 4)
+if (args.Length == 5)
 {
     gameDirectory = args[0];
     tlkDirectory = args[1];
     gamFile = args[2];
     dFile = args[3];
+    luaPath = args[4];
 }
 
-var sw = new Stopwatch();
+var luaReader = new BaldurLuaReader(luaPath);
 
 var game = new Game(gameDirectory, tlkDirectory);
 game.LoadAllResources();
@@ -60,7 +62,7 @@ if (d.states.Any(a => a.Weight > 0))
     d.states = d.states.OrderBy(o => o.Weight).ToList();
 }
 
-var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores, game.Items, gam, game.Tlk);
+var tp = new TriggerProcessor(objectLocator, idsProcessor, game.DimensionalArrays, game.Stores, game.Items, gam, game.Tlk, luaReader);
 tp.Area = area;
 tp.GlobalState = globalVariables;
 tp.Game = gam;
@@ -91,8 +93,8 @@ foreach (var state in d.states)
 
         var triggers = SplitTriggers(trigger);
 
-        triggers = new string[1];
-        triggers[0] = "CharName(\"Palagorn\", \"Myself\")";
+        //triggers = new string[1];
+        //triggers[0] = "INI(\"test\", 123)";
 
         valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
     }

@@ -9,9 +9,10 @@ public class TriggerProcessor
     private List<ItmFile> items;
     private GamFile game;
     private TlkFile tlk;
+    private BaldurLuaReader luaReader;
 
     public TriggerProcessor(ObjectLocator objectLocator, IdsProcessor idsProcessor, List<DimensionalArrayFile> dimensionalArrayFiles, List<StoFile> stores, List<ItmFile> items,
-                            GamFile game, TlkFile tlk)
+                            GamFile game, TlkFile tlk, BaldurLuaReader luaReader)
     {
         this.objectLocator = objectLocator;
         this.idsProcessor = idsProcessor;
@@ -20,6 +21,7 @@ public class TriggerProcessor
         this.items = items;
         this.game = game;
         this.tlk = tlk;
+        this.luaReader = luaReader;
         random = new Random();
     }
 
@@ -1989,9 +1991,58 @@ public class TriggerProcessor
                creature?.Items.InventoryItem16.Filename != null;
     }
 
-    public bool HasItemEquippedReal(string resRef, string obj)
+    public bool HasItemEquipedReal(string resRef, string obj)
     {
         return false;
+
+        //var creature = objectLocator.GetObject(obj);
+        //return
+        //    creature.Items.Helmet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Armor?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Shield?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Gloves?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.RingLeft?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.RingRight?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Amulet?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Belt?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Boots?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Weapon1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Weapon2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Weapon3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Weapon4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Quiver1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Quiver2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Quiver3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Quiver4?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.Cloak?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.QuickItem1?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.QuickItem2?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper() ||
+        //    creature.Items.QuickItem3?.Filename.ToString().ToUpper().Trim('\0') == resRef.ToUpper();
+
+
+        //var slot = 35 + this.Creature.Items.SelectedWeapon;
+        //switch (slot)
+        //{
+        //    case 11:
+        //        return this.Creature.Items.Quiver1?.Charges1 == 0 || this.Creature.Items.Quiver1 == null;
+        //    case 12:
+        //        return this.Creature.Items.Quiver2?.Charges1 == 0 || this.Creature.Items.Quiver2 == null;
+        //    case 13:
+        //        return this.Creature.Items.Quiver3?.Charges1 == 0 || this.Creature.Items.Quiver3 == null;
+        //    case 14:
+        //        return this.Creature.Items.Quiver4?.Charges1 == 0 || this.Creature.Items.Quiver4 == null;
+
+        //    case 34:
+        //        return false;
+        //    case 35:
+        //        return false;
+        //    case 36:
+        //        return false;
+        //    case 37:
+        //        return false;
+        //    case 38:
+        //        return false;
+        //}
     }
 
     public bool XP(string obj, int xp)
@@ -2139,7 +2190,7 @@ public class TriggerProcessor
 
     public bool BeenInParty(string name)
     {
-        return false;
+        return this.Creature.Flags.BeenInParty;
     }
 
     public bool NextTriggerObject(string obj)
@@ -2205,7 +2256,7 @@ public class TriggerProcessor
                 return item.itmExtendedHeaders.First().AttackType == AttackType.Ranged;
         }
 
-         return false;
+        return false;
     }
 
     public bool ButtonDisabled(int button)
@@ -2256,8 +2307,9 @@ public class TriggerProcessor
 
     public bool INI(string name, int number)
     {
-        return false;
+        return luaReader.HasEntry(name, number);
     }
+
     public bool ModalStateObject(string obj, int modalState)
     {
         var creature = objectLocator.GetObject(obj);
@@ -2312,7 +2364,9 @@ public class TriggerProcessor
 
     public bool ImmuneToSpellLevel(string obj, int level)
     {
-        return false;
+        return
+            this.Creature.Effects1.Where(w => w.Opcode == 102 && w.Parameter1 == level).Any() ||
+            this.Creature.Effects2.Where(w => w.Opcode == 102 && w.Parameter1 == level).Any();
     }
 
     public bool StoryModeOn()
