@@ -1866,14 +1866,53 @@ public class TriggerProcessor
         return objectLocator.Party.Count(c => !c.CreFile.StatusFlags.Dead) < num;
     }
 
+    private static int KitToInt(Kit kit)
+    {
+        var value = 0;
+        if (kit.Abjurer) value |= 0x40;
+        if (kit.Conjurer) value |= 0x80;
+        if (kit.Diviner) value |= 0x100;
+        if (kit.Enchanter) value |= 0x200;
+        if (kit.Illusionist) value |= 0x400;
+        if (kit.Invoker) value |= 0x800;
+        if (kit.Necromancer) value |= 0x1000;
+        if (kit.Transmuter) value |= 0x2000;
+        if (kit.TrueClass) value |= 0x4000;
+        if (kit.Berserker) value |= 0x4001;
+        if (kit.WizardSlayer) value |= 0x4002;
+        if (kit.Kensai) value |= 0x4003;
+        if (kit.Cavalier) value |= 0x4004;
+        if (kit.Inquisitor) value |= 0x4005;
+        if (kit.Undeadhunter) value |= 0x4006;
+        if (kit.Archer) value |= 0x4007;
+        if (kit.Stalker) value |= 0x4008;
+        if (kit.Beastmaster) value |= 0x4009;
+        if (kit.Assassin) value |= 0x400A;
+        if (kit.Bountyhunter) value |= 0x400B;
+        if (kit.Swashbuckler) value |= 0x400C;
+        if (kit.Blade) value |= 0x400D;
+        if (kit.Jester) value |= 0x400E;
+        if (kit.Skald) value |= 0x400F;
+        if (kit.Totemic) value |= 0x4010;
+        if (kit.Shapeshifter) value |= 0x4011;
+        if (kit.Avenger) value |= 0x4012;
+        if (kit.ClericOfTalos) value |= 0x4013;
+        if (kit.ClericOfHelm) value |= 0x4014;
+        if (kit.ClericOfLathander) value |= 0x4015;
+        if (kit.Barbarian) value |= unchecked((int)0x40000000);
+        return value;
+    }
+
     public bool Kit(string obj, int kit)
     {
-        //var creature = objectLocator.GetObject(obj);
+        var creature = objectLocator.GetObject(obj);
 
-        //if (creature == null)
-        //    return false;
+        if (creature == null)
+            return false;
 
-        return false;
+        var creatureKit = KitToInt(creature.Kit);
+
+        return creatureKit == kit;
     }
 
     public bool IsGabber(string obj)
@@ -1888,7 +1927,32 @@ public class TriggerProcessor
 
     public bool CharName(string name, string obj)
     {
-        return false;
+        // Find the creature specified by obj
+        // Find the party member with the same death variable
+        // Get the GAM record associated with that party member
+        // Check the name
+        // If no match, find the GAM record with a voiceset (hopefully the PC) and check that
+        // If no match, just check the name specified by the strref
+        if (string.IsNullOrEmpty(name))
+            return false;
+
+        var creature = objectLocator.GetObject(obj);
+
+        if (creature == null)
+            return false;
+
+        var creatureFromGam = game.PartyMembers.Where(w => w.CreFile.DeathVariable.ToString().Trim('\0').ToUpper() == creature.DeathVariable.ToString().Trim('\0').ToUpper()).FirstOrDefault();
+
+        if (creatureFromGam == null)
+        {
+            creatureFromGam = game.PartyMembers.Where(w => !String.IsNullOrEmpty(w.VoiceSet.ToString())).FirstOrDefault();
+            if (creatureFromGam != null)
+            {
+                return creatureFromGam.Name.ToString().ToUpper().Trim('\0') == name.ToUpper();
+            }
+        }
+
+        return creature.LongName.Text.ToString().ToUpper().Trim('\0') == name.ToUpper();
     }
 
     public bool FallenRanger(string obj)
@@ -2158,7 +2222,7 @@ public class TriggerProcessor
 
     public bool NightmareModeOn()
     {
-        return false;
+        return this.GlobalState.Where(w => w.name.ToUpper().Trim('\0') == "BD_NIGHTMARE_MODE").FirstOrDefault().value == 1;
     }
 
     public bool OriginalClass(string obj, int @class)
@@ -2253,12 +2317,15 @@ public class TriggerProcessor
 
     public bool StoryModeOn()
     {
-        return false;
+        return this.GlobalState.Where(w => w.name.ToUpper().Trim('\0') == "BD_STORY_MODE").FirstOrDefault().value == 1;
     }
 
     public bool IsForcedRandomEncounterActive(string area)
     {
-        return false;
+        if (string.IsNullOrEmpty(area))
+            return !String.IsNullOrEmpty(game.RandomEncounterArea.ToString());
+
+        return game.RandomEncounterArea.ToString().ToUpper().Trim('\0') == area.ToUpper().Trim('\0');
     }
 
     public bool ClassLevel(string obj, int category, int value)

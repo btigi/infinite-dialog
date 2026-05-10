@@ -8,7 +8,7 @@ using ii.InfinityEngine.Readers;
 var gameDirectory = @"C:\speed\bg2ee";
 var tlkDirectory = @"C:\speed\bg2ee\lang\en_US";
 var gamFile = @"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam";
-var dFile = "MOOK.DLG";
+var dFile = "ARNWAR06.DLG";
 
 if (args.Length == 4)
 {
@@ -91,8 +91,8 @@ foreach (var state in d.states)
 
         var triggers = SplitTriggers(trigger);
 
-        //triggers = new string[1];
-        //triggers[0] = "ClassLevel(\"MINSC\", 1, 1)";
+        triggers = new string[1];
+        triggers[0] = "CharName(\"Palagorn\", \"Myself\")";
 
         valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
     }
