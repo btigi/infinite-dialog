@@ -2145,17 +2145,35 @@ public class TriggerProcessor
 
     public bool LevelParty(int num)
     {
-        return false;
+        var level = 0;
+        foreach (var partyMember in game.PartyMembers)
+        {
+            level += Math.Max(Math.Max(partyMember.CreFile.Level1, partyMember.CreFile.Level2), partyMember.CreFile.Level3);
+        }
+
+        return level == num;
     }
 
     public bool LevelPartyGT(int num)
     {
-        return false;
+        var level = 0;
+        foreach (var partyMember in game.PartyMembers)
+        {
+            level += Math.Max(Math.Max(partyMember.CreFile.Level1, partyMember.CreFile.Level2), partyMember.CreFile.Level3);
+        }
+
+        return level > num;
     }
 
     public bool LevelPartyLT(int num)
     {
-        return false;
+        var level = 0;
+        foreach (var partyMember in game.PartyMembers)
+        {
+            level += Math.Max(Math.Max(partyMember.CreFile.Level1, partyMember.CreFile.Level2), partyMember.CreFile.Level3);
+        }
+
+        return level < num;
     }
 
     public bool HaveSpellParty(int spell)
@@ -2165,12 +2183,12 @@ public class TriggerProcessor
 
     public bool AmIInWatchersKeepPleaseIgnoreTheLackOfApostophe()
     {
-        return false;
+        return InWatchersKeep();
     }
 
     public bool InWatchersKeep()
     {
-        return false;
+        return this.Area.AreaCode.ToUpper().StartsWith("AR30");
     }
 
     public bool AreaCheckAllegiance(int allegience)
