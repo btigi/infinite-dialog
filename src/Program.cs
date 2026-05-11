@@ -94,7 +94,7 @@ foreach (var state in d.states)
         var triggers = SplitTriggers(trigger);
 
         //triggers = new string[1];
-        //triggers[0] = "INI(\"test\", 123)";
+        //triggers[0] = "HaveSpellParty(1112)";
 
         valid = EvaluateTriggers<TriggerProcessor>(triggers, tp, game.Identifiers);
     }
