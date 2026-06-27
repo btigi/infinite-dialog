@@ -1,15 +1,19 @@
-﻿using System.Diagnostics;
-using ii.InfinityEngine;
+﻿using ii.InfinityEngine;
 using ii.InfinityEngine.Files;
 using ii.InfinityEngine.Readers;
 
-//var gameDirectory = @"D:\Games\ie\bg2ee";
-//var tlkDirectory = @"D:\Games\ie\bg2ee\lang\en_US";
-var gameDirectory = @"C:\speed\bg2ee";
-var tlkDirectory = @"C:\speed\bg2ee\lang\en_US";
-var gamFile = @"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam";
-var dFile = "ARNWAR06.DLG";
-var luaPath = @"C:\Users\igi\Documents\Baldur's Gate II - Enhanced Edition\Baldur.lua";
+
+//var gameDirectory = @"C:\speed\bg2ee";
+//var tlkDirectory = @"C:\speed\bg2ee\lang\en_US";
+//var gamFile = @"C:\Users\igi\Downloads\baldursgate2shadowsofamn_savegames_all\BGII\save\000000065-057 North Forest\baldur.gam";
+//var dFile = "PPDILI.DLG";
+//var luaPath = @"C:\Users\igi\Documents\Baldur's Gate II - Enhanced Edition\Baldur.lua";
+
+var gameDirectory = "";
+var tlkDirectory = "";
+var gamFile = "";
+var dFile = "";
+var luaPath = "";
 
 if (args.Length == 5)
 {
